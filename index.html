@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pod Workshop</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#071114;--bg2:#0d1b1f;--card:#112328;--line:#1d3a40;--ac:#19e6c1;--tx:#e8f6f4;--mu:#8aa9a8;--red:#ff5a4f}
+*{box-sizing:border-box;margin:0}
+body{font-family:Poppins,system-ui,sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;background:radial-gradient(600px 400px at 75% 10%,#19e6c126,transparent),radial-gradient(500px 400px at 5% 90%,#8a6bff1c,transparent);pointer-events:none}
+a{color:inherit;text-decoration:none;cursor:pointer}
+nav{position:sticky;top:0;z-index:9;display:flex;align-items:center;gap:22px;padding:14px 5vw;background:#071114cc;backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .logo{font-weight:700;font-size:20px;margin-right:auto}nav .logo i{color:var(--ac);font-style:normal}
+nav a{color:var(--mu);font-size:14px;transition:color .2s}nav a:hover{color:var(--ac)}
+main{position:relative;padding:0 5vw 80px;min-height:80vh}
+.btn{display:inline-block;border:0;border-radius:999px;padding:12px 26px;font:600 14px Poppins;background:var(--ac);color:#04201b;cursor:pointer;transition:transform .15s ease,box-shadow .25s;will-change:transform}
+.btn:hover{box-shadow:0 8px 30px #19e6c155}.btn:active{transform:scale(.94)!important}
+.btn.ghost{background:transparent;color:var(--tx);border:1px solid var(--line)}.btn.sm{padding:7px 14px;font-size:12px}.btn.red{background:var(--red);color:#fff}
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:30px;align-items:center;min-height:78vh}
+.hero h1{font-size:clamp(40px,7vw,84px);line-height:1;letter-spacing:-2px}
+.hero p{color:var(--mu);margin:18px 0 28px;max-width:44ch;line-height:1.6}
+.stage{display:grid;place-items:center;position:relative}
+.stage svg{width:min(320px,70%);animation:float 5s ease-in-out infinite;filter:drop-shadow(0 30px 40px #19e6c133)}
+.smoke{position:absolute;top:2%;width:140px;height:140px;border-radius:50%;background:radial-gradient(#cfeee9aa,transparent 65%);filter:blur(14px);animation:rise 5s ease-in infinite}
+.smoke:nth-child(2){animation-delay:1.6s;left:46%}.smoke:nth-child(3){animation-delay:3.2s;left:30%}
+@keyframes float{50%{transform:translateY(-16px) rotate(2deg)}}
+@keyframes rise{0%{transform:translateY(60px) scale(.4);opacity:0}30%{opacity:.7}100%{transform:translateY(-80px) scale(1.5);opacity:0}}
+h2{font-size:28px;margin:60px 0 24px;text-align:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;cursor:pointer;transition:transform .25s,border-color .25s}
+.card:hover{transform:translateY(-6px);border-color:var(--ac)}
+.card .img{height:170px;border-radius:12px;background:var(--bg2);display:grid;place-items:center;margin-bottom:12px}
+.card .img svg{height:140px;transition:transform .4s}.card:hover .img svg{transform:rotate(-8deg) scale(1.1)}
+.card h3{font-size:15px;font-weight:500}.card .row{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.price{color:var(--ac);font-weight:600}
+.tag{font-size:11px;background:var(--ac);color:#04201b;border-radius:6px;padding:2px 8px;font-weight:600}
+.chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:8px 20px;font-size:13px;cursor:pointer;color:var(--mu);transition:.2s}.chip.on,.chip:hover{background:var(--ac);color:#04201b;border-color:var(--ac)}
+.rv{opacity:0;transform:translateY(40px);transition:opacity .7s,transform .7s}.rv.in{opacity:1;transform:none}
+.pd{display:grid;grid-template-columns:1fr 1fr;gap:40px;padding-top:40px;align-items:center;animation:pop .45s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes pop{from{opacity:0;transform:scale(.94) translateY(20px)}}
+.pd .big{background:var(--card);border:1px solid var(--line);border-radius:24px;height:min(480px,60vw);display:grid;place-items:center}.pd .big svg{height:80%;animation:float 5s ease-in-out infinite}
+.pd h1{font-size:34px;margin:10px 0}.pd p{color:var(--mu);line-height:1.7;margin:12px 0}.pd .price{font-size:32px;display:block;margin:14px 0}
+.qty{display:inline-flex;align-items:center;gap:12px;margin-right:12px}.qty b{min-width:20px;text-align:center}
+.box{max-width:420px;margin:60px auto;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:30px;animation:pop .4s}
+.box h1{font-size:26px;margin-bottom:6px}.tabs{display:flex;gap:6px;margin:16px 0}.tabs .chip{flex:1;text-align:center}
+input,select{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--tx);font:14px Poppins;margin:6px 0 12px}
+input:focus{outline:2px solid var(--ac)}label.ck{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mu)}label.ck input{width:auto;margin:0}
+.lr{display:flex;justify-content:space-between;align-items:center;margin:4px 0 18px}.lr a{font-size:13px;color:var(--ac)}
+.msg{font-size:13px;margin:10px 0;color:var(--ac)}.msg.err{color:var(--red)}
+.cart{max-width:720px;margin:40px auto}.line{display:flex;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}.line svg{height:50px}.line div{flex:1}
+.adm{display:grid;grid-template-columns:200px 1fr;gap:24px;padding-top:30px}
+.side{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:16px;height:fit-content}.side a{display:block;padding:10px 12px;border-radius:10px;color:var(--mu);font-size:14px}.side a.on,.side a:hover{background:var(--card);color:var(--ac)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:20px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}.stat small{color:var(--mu)}.stat b{display:block;font-size:26px;margin-top:6px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:18px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}th{color:var(--mu);font-weight:500;text-align:left}td,th{padding:10px 8px;border-bottom:1px solid var(--line)}
+.frm{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}.frm input{margin:0}
+.bars{display:flex;align-items:end;gap:10px;height:120px}.bars i{flex:1;background:linear-gradient(var(--ac),#19e6c122);border-radius:6px 6px 0 0;transform-origin:bottom;animation:grow .9s both}
+@keyframes grow{from{transform:scaleY(0)}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,80px);background:var(--ac);color:#04201b;padding:12px 22px;border-radius:999px;font-weight:600;transition:.35s;z-index:20}.toast.on{transform:translate(-50%,0)}
+input.ed{background:transparent;border:1px solid transparent;border-radius:8px;padding:6px 8px;margin:0;min-width:90px}input.ed:hover,select.ed:hover{border-color:var(--line)}input.ed:focus{background:var(--bg2);border-color:var(--ac);outline:0}select.ed{margin:0;padding:6px}
+#savebar{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);display:flex;gap:16px;align-items:center;background:var(--card);border:1px solid var(--ac);border-radius:999px;padding:8px 8px 8px 22px;box-shadow:0 10px 40px #000a;transition:transform .35s cubic-bezier(.2,.9,.3,1.3);z-index:15;font-size:14px}#savebar.on{transform:translate(-50%,0)}
+@media(max-width:760px){.hero,.pd{grid-template-columns:1fr}.adm{grid-template-columns:1fr}nav{gap:12px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style></head><body>
+<nav><a class="logo" href="#/">Pod<i>Workshop</i></a><a href="#/">Shop</a><a href="#/cart">Cart (<span id="cc">0</span>)</a><a id="authLink" href="#/login">Log in</a></nav>
+<main id="app"></main><div class="toast" id="toast"></div>
+<script>
+// ===== 1) PUT YOUR SUPABASE KEYS HERE (Project Settings > API) =====
+const SB_URL='YOUR_SUPABASE_URL', SB_KEY='YOUR_SUPABASE_ANON_KEY';
+// ===================================================================
+const live=!SB_URL.startsWith('YOUR');
+const demo=[['Nebula X Pod Kit','Devices',34.9,'#19e6c1'],['Ember Mini','Devices',24.5,'#ff5a4f'],['Violet Drift','Devices',49,'#8a6bff'],['Mesh Coil Pods (3 pack)','Pods',12,'#19e6c1'],['Cloud Tank Pods (2 pack)','Pods',9.5,'#f5c84b'],['Dock Charger','Accessories',15,'#c6ff3d']].map((p,i)=>({id:i+1,name:p[0],category:p[1],price:p[2],color:p[3],stock:20,is_new:true,description:'Demo product. Connect Supabase to load real items.'}));
+let sb,user=null,admin=false,products=[],cart=JSON.parse(localStorage.getItem('cart')||'[]'),cat='All',back='#/';
+const $=s=>document.querySelector(s),app=$('#app');
+const money=n=>'$'+Number(n).toFixed(2);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2200)}
+function client(){const rm=localStorage.getItem('rm')!=='0';sb=supabase.createClient(SB_URL,SB_KEY,{auth:{storage:rm?localStorage:sessionStorage,persistSession:true}})}
+const pod=(c='#19e6c1',h=300)=>`<svg viewBox="0 0 120 300" height="${h}"><rect x="38" y="70" width="44" height="210" rx="16" fill="#1b2e33" stroke="${c}" stroke-width="2"/><rect x="46" y="20" width="28" height="56" rx="8" fill="${c}" opacity=".85"/><rect x="50" y="2" width="20" height="24" rx="6" fill="#0d1b1f" stroke="${c}"/><circle cx="60" cy="150" r="10" fill="${c}"/><rect x="48" y="200" width="24" height="5" rx="2" fill="${c}" opacity=".5"/></svg>`;
+async function boot(){
+  if(live){client();const{data}=await sb.from('products').select('*').order('id');products=data||[];
+    const{data:{session}}=await sb.auth.getSession();await setUser(session?.user);
+    sb.auth.onAuthStateChange((e,s)=>{if(e==='PASSWORD_RECOVERY')location.hash='#/reset';setUser(s?.user)});
+  }else products=demo;
+  route();
+}
+async function setUser(u){user=u||null;admin=false;
+  if(user&&live){const{data}=await sb.from('profiles').select('role').eq('id',user.id).single();admin=data?.role==='admin'}
+  $('#authLink').textContent=user?'Log out':'Log in';$('#authLink').href=user?'#/logout':'#/login';}
+function saveCart(){localStorage.setItem('cart',JSON.stringify(cart));$('#cc').textContent=cart.reduce((a,c)=>a+c.qty,0)}
+function addCart(id,q=1){const c=cart.find(x=>x.id==id);c?c.qty+=q:cart.push({id,qty:q});saveCart();toast('Added to cart')}
+const R={
+ home(){const cats=['All',...new Set(products.map(p=>p.category))];
+  const list=products.filter(p=>cat==='All'||p.category===cat);
+  return `<section class="hero"><div><h1>Smoother than ever</h1><p>Pods, devices and accessories built and tested in our workshop. Pick a kit, add it to your cart, and check out in a minute.</p><a class="btn" href="#shop">Shop now</a></div>
+  <div class="stage"><i class="smoke"></i><i class="smoke"></i><i class="smoke"></i>${pod()}</div></section>
+  <h2 id="shop" class="rv">New arrivals</h2><div class="chips rv">${cats.map(c=>`<span class="chip ${c===cat?'on':''}" data-cat="${esc(c)}">${esc(c)}</span>`).join('')}</div>
+  <div class="grid">${list.map(card).join('')}</div>`},
+ product(id){const p=products.find(x=>x.id==id);if(!p)return'<p>Not found.</p>';
+  return `<div class="pd"><div class="big">${p.image_url?`<img src="${esc(p.image_url)}" style="height:80%">`:pod(p.color)}</div><div><span class="tag">${esc(p.category)}</span><h1>${esc(p.name)}</h1><p>${esc(p.description)}</p><span class="price">${money(p.price)}</span><p>${p.stock>0?p.stock+' in stock':'Out of stock'}</p>
+  <div class="qty"><button class="btn ghost sm" data-q="-1">-</button><b id="q">1</b><button class="btn ghost sm" data-q="1">+</button></div>
+  <button class="btn" data-buy="${p.id}" ${p.stock<1?'disabled':''}>Add to cart</button></div></div>`},
+ cart(){if(!cart.length)return'<div class="cart"><h2>Your cart is empty</h2><p style="text-align:center"><a class="btn" href="#/">Browse the shop</a></p></div>';
+  const t=cart.reduce((a,c)=>a+c.qty*(products.find(p=>p.id==c.id)?.price||0),0);
+  return `<div class="cart"><h2>Your cart</h2>${cart.map(c=>{const p=products.find(x=>x.id==c.id)||{};return `<div class="line">${pod(p.color,50)}<div>${esc(p.name)}<br><span class="price">${money(p.price)}</span> x ${c.qty}</div><button class="btn ghost sm" data-rm="${c.id}">Remove</button></div>`}).join('')}
+  <div class="panel"><b>Total ${money(t)}</b><input id="addr" placeholder="Delivery address"><button class="btn" data-checkout>Check out</button></div></div>`},
+ login(mode='in'){return `<div class="box"><h1>${mode==='in'?'Welcome back':'Create your account'}</h1><p style="color:var(--mu);font-size:13px">Log in to check out.</p>
+  <div class="tabs"><span class="chip ${mode==='in'?'on':''}" data-tab="in">Log in</span><span class="chip ${mode==='up'?'on':''}" data-tab="up">Sign up</span></div>
+  <form id="af" data-mode="${mode}">${mode==='up'?'<input name="name" placeholder="Full name" required>':''}<input name="email" type="email" placeholder="Email" required><input name="pw" type="password" placeholder="Password (6+ characters)" minlength="6" required>
+  ${mode==='in'?'<div class="lr"><label class="ck"><input type="checkbox" name="rm" checked>Remember me</label><a href="#/forgot">Forgot password?</a></div>':''}
+  <button class="btn" style="width:100%">${mode==='in'?'Log in':'Sign up'}</button><div class="msg" id="msg"></div></form></div>`},
+ forgot(){return `<div class="box"><h1>Reset password</h1><p style="color:var(--mu);font-size:13px;margin-bottom:12px">We will email you a reset link.</p><form id="ff"><input name="email" type="email" placeholder="Email" required><button class="btn" style="width:100%">Send reset link</button><div class="msg" id="msg"></div></form><p style="margin-top:14px;font-size:13px"><a href="#/login" style="color:var(--ac)">Back to log in</a></p></div>`},
+ reset(){return `<div class="box"><h1>New password</h1><form id="rf"><input name="pw" type="password" placeholder="New password" minlength="6" required><button class="btn" style="width:100%">Save password</button><div class="msg" id="msg"></div></form></div>`},
+ admin(){if(live&&!admin)return`<div class="box"><h1>Admins only</h1><p style="color:var(--mu)">Log in with an admin account.</p></div>`;return'<div id="adm">Loading...</div>'}
+};
+const card=p=>`<div class="card rv" data-go="${p.id}"><div class="img">${p.image_url?`<img src="${esc(p.image_url)}" height="140">`:pod(p.color,140)}</div><h3>${esc(p.name)}</h3><div class="row"><span class="price">${money(p.price)}</span>${p.is_new?'<span class="tag">New</span>':''}</div></div>`;
+let dirty={p:{},o:{}};
+const nd=()=>Object.keys(dirty.p).length+Object.keys(dirty.o).length;
+function bar(){$('#savebar')?.classList.toggle('on',nd()>0);if($('#savecount'))$('#savecount').textContent=nd()+' unsaved change'+(nd()>1?'s':'')}
+async function adminView(){
+  dirty={p:{},o:{}};
+  let orders=[];if(live){const r=await sb.from('orders').select('*').order('id',{ascending:false});orders=r.data||[]}
+  const rev=orders.filter(o=>o.status!=='cancelled').reduce((a,o)=>a+Number(o.total),0),bars=[...orders].slice(0,8).reverse();
+  const ed=(p,f,t='text',w='')=>`<input class="ed" type="${t}" ${t==='number'?'step="any"':''} value="${esc(p[f])}" data-pid="${p.id}" data-f="${f}" style="${w}">`;
+  $('#adm').outerHTML=`<div class="adm"><div class="side"><b style="display:block;padding:10px 12px">Pod Admin</b><a class="on">Overview</a><a href="#/">View shop</a></div><div>
+  <div class="stats"><div class="stat"><small>Revenue</small><b>${money(rev)}</b></div><div class="stat"><small>Orders</small><b>${orders.length}</b></div><div class="stat"><small>Products</small><b>${products.length}</b></div><div class="stat"><small>Low stock</small><b>${products.filter(p=>p.stock<10).length}</b></div></div>
+  <div class="panel"><b>Sales performance</b><div class="bars" style="margin-top:14px">${(bars.length?bars:[{total:30},{total:60},{total:45},{total:90}]).map((o,i)=>`<i style="height:${Math.max(12,Math.min(100,o.total))}%;animation-delay:${i*.08}s"></i>`).join('')}</div></div>
+  <div class="panel"><b>Add product</b><form id="pf" class="frm" style="margin-top:12px"><input name="name" placeholder="Name" required><input name="category" placeholder="Category" value="Pods"><input name="price" type="number" step="0.01" placeholder="Price" required><input name="stock" type="number" placeholder="Stock" required><input name="image_url" placeholder="Image URL (optional)"><input name="description" placeholder="Description"><button class="btn sm">Add product</button></form></div>
+  <div class="panel"><b>Products</b> <small style="color:var(--mu)">Click any cell to edit it.</small><table><tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Description</th><th>Image URL</th><th>New</th><th></th></tr>${products.map(p=>`<tr><td>${ed(p,'name')}</td><td>${ed(p,'category','text','width:110px')}</td><td>${ed(p,'price','number','width:80px')}</td><td>${ed(p,'stock','number','width:70px')}</td><td>${ed(p,'description')}</td><td>${ed(p,'image_url')}</td><td><input type="checkbox" class="ed" data-pid="${p.id}" data-f="is_new" ${p.is_new?'checked':''} style="width:auto;margin:0"></td><td><button class="btn red sm" data-del="${p.id}">Delete</button></td></tr>`).join('')}</table></div>
+  <div class="panel"><b>Orders</b><table><tr><th>#</th><th>Total</th><th>Address</th><th>Status</th><th>Date</th></tr>${orders.map(o=>`<tr><td>${o.id}</td><td>${money(o.total)}</td><td><input class="ed" value="${esc(o.address)}" data-oid="${o.id}" data-f="address"></td><td><select class="ed" data-oid="${o.id}" data-f="status">${['pending','paid','shipped','cancelled'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}</select></td><td>${new Date(o.created_at).toLocaleDateString()}</td></tr>`).join('')||'<tr><td colspan=5>No orders yet.</td></tr>'}</table></div></div></div>
+  <div id="savebar"><span id="savecount"></span><button class="btn" data-save>Save changes</button></div>`;
+}
+async function saveAll(){
+  const btn=$('[data-save]');btn.disabled=true;btn.textContent='Saving...';
+  let err=null;
+  for(const[id,v]of Object.entries(dirty.p)){if(live){const r=await sb.from('products').update(v).eq('id',id);if(r.error)err=r.error}
+    const p=products.find(x=>x.id==id);if(p)Object.assign(p,v)}
+  for(const[id,v]of Object.entries(dirty.o)){if(live){const r=await sb.from('orders').update(v).eq('id',id);if(r.error)err=r.error}}
+  btn.disabled=false;btn.textContent='Save changes';
+  if(err)return toast('Could not save: '+err.message);
+  dirty={p:{},o:{}};bar();toast('Saved');
+}
+async function reload(){if(live){const{data}=await sb.from('products').select('*').order('id');products=data||[]}}
+function route(){
+  const h=location.hash||'#/',[,r,a]=h.match(/^#\/?([^/]*)\/?(.*)$/)||[];
+  if(h==='#shop')return;
+  if(r==='logout'){sb?.auth.signOut();user=null;admin=false;setUser(null);location.hash='#/';return}
+  let html;
+  if(r==='product')html=R.product(a);else if(r==='cart')html=R.cart();else if(r==='login')html=R.login(a==='up'?'up':'in');
+  else if(r==='forgot')html=R.forgot();else if(r==='reset')html=R.reset();else if(r==='admin')html=R.admin();else html=R.home();
+  app.innerHTML=html;scrollTo(0,0);observe();if(r==='admin'&&(admin||!live))adminView();
+}
+let io;function observe(){io?.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});document.querySelectorAll('.rv').forEach((e,i)=>{e.style.transitionDelay=(i%4)*70+'ms';io.observe(e)})}
+// magnetic buttons: they lean toward the cursor
+document.addEventListener('mousemove',e=>{document.querySelectorAll('.btn').forEach(b=>{const r=b.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
+  b.style.transform=Math.hypot(dx,dy)<90?`translate(${dx*.25}px,${dy*.3}px)`:''})});
+document.addEventListener('click',async e=>{const t=e.target;let d;
+  if(d=t.closest('[data-go]'))location.hash='#/product/'+d.dataset.go;
+  else if(t.closest('[data-save]'))saveAll();
+  else if(d=t.closest('[data-cat]')){cat=d.dataset.cat;route()}
+  else if(d=t.closest('[data-tab]'))location.hash='#/login/'+d.dataset.tab;
+  else if(d=t.closest('[data-q]')){const q=$('#q');q.textContent=Math.max(1,+q.textContent+ +d.dataset.q)}
+  else if(d=t.closest('[data-buy]'))addCart(d.dataset.buy,+$('#q').textContent);
+  else if(d=t.closest('[data-rm]')){cart=cart.filter(c=>c.id!=d.dataset.rm);saveCart();route()}
+  else if(d=t.closest('[data-del]')){if(live&&confirm('Delete this product?')){await sb.from('products').delete().eq('id',d.dataset.del);await reload();route()}}
+  else if(t.closest('[data-checkout]')){
+    if(!user&&live){back='#/cart';toast('Log in or sign up to check out');location.hash='#/login';return}
+    if(!live)return toast('Connect Supabase to place orders');
+    const addr=$('#addr').value.trim();if(!addr)return toast('Enter a delivery address');
+    const total=cart.reduce((a,c)=>a+c.qty*products.find(p=>p.id==c.id).price,0);
+    const{data:o,error}=await sb.from('orders').insert({user_id:user.id,total,address:addr}).select().single();
+    if(error)return toast(error.message);
+    await sb.from('order_items').insert(cart.map(c=>{const p=products.find(x=>x.id==c.id);return{order_id:o.id,product_id:p.id,name:p.name,qty:c.qty,price:p.price}}));
+    cart=[];saveCart();toast('Order placed');location.hash='#/'}
+});
+function track(e){const t=e.target;if(!t.classList.contains('ed'))return;
+  const v=t.type==='checkbox'?t.checked:t.type==='number'?(t.value===''?null:+t.value):t.value;
+  const k=t.dataset.pid?'p':'o',id=t.dataset.pid||t.dataset.oid;(dirty[k][id]??={})[t.dataset.f]=v;bar()}
+document.addEventListener('input',track);document.addEventListener('change',track);
+document.addEventListener('submit',async e=>{e.preventDefault();const f=e.target,v=Object.fromEntries(new FormData(f)),m=$('#msg');
+  const say=(t,er)=>{if(m){m.textContent=t;m.className='msg'+(er?' err':'')}};
+  if(!live)return toast('Add your Supabase keys first');
+  if(f.id==='af'){
+    if(f.dataset.mode==='in'){localStorage.setItem('rm',v.rm?'1':'0');client();
+      const{error}=await sb.auth.signInWithPassword({email:v.email,password:v.pw});if(error)return say(error.message,1);
+      location.hash=back;back='#/'}
+    else{client();const{data,error}=await sb.auth.signUp({email:v.email,password:v.pw,options:{data:{full_name:v.name}}});if(error)return say(error.message,1);
+      if(data.session){location.hash=back;back='#/'}else say('Check your email to confirm your account, then log in.')}}
+  if(f.id==='ff'){const{error}=await sb.auth.resetPasswordForEmail(v.email,{redirectTo:location.href.split('#')[0]});say(error?error.message:'Reset link sent. Check your inbox.',!!error)}
+  if(f.id==='rf'){const{error}=await sb.auth.updateUser({password:v.pw});if(error)return say(error.message,1);toast('Password updated');location.hash='#/'}
+  if(f.id==='pf'){const{error}=await sb.from('products').insert({...v,price:+v.price,stock:+v.stock});if(error)return toast(error.message);await reload();toast('Product added');route()}
+});
+let taps=[];$('.logo').addEventListener('click',e=>{const n=Date.now();taps=taps.filter(x=>n-x<2500);taps.push(n);
+  if(taps.length>=5){taps=[];e.preventDefault();location.hash='#/admin'}});
+addEventListener('hashchange',route);saveCart();boot();
+</script></body></html>
