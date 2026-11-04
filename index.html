@@ -693,13 +693,14 @@ $('#langBtn').addEventListener('click',()=>{lang=lang==='ar'?'en':'ar';localStor
 /* ================= SUPPORT CHAT ================= */
 let supportConversation=null;
 let pendingSupport=false;
-function supportGateUI(){const li=loggedIn();$('#supportGate').hidden=li;$('#supportForm').hidden=!li;$('#supportMessages').hidden=!li}
-async function openSupport(){$('#supportPanel').classList.add('open');supportGateUI();if(!loggedIn())return;try{const u=user;const {data,error}=await db.from('support_conversations').select('*').eq('user_id',u.id).eq('status','open').order('created_at',{ascending:false}).limit(1).maybeSingle();if(error)throw error;if(data)supportConversation=data;else{const made=await db.from('support_conversations').insert({user_id:u.id,visitor_email:u.email||null,status:'open'}).select().single();if(made.error)throw made.error;supportConversation=made.data}await loadSupportMessages()}catch(err){console.warn(err);supportNotice(/support_conversations|schema cache|does not exist/i.test(err.message||'')?t('sp_setup'):t('sp_down')+' ('+(err.message||'')+')')}}
+function supportGateUI(){$('#supportGate').hidden=true;$('#supportForm').hidden=false;$('#supportMessages').hidden=false}
+async function chatUser(){if(user)return user;const {data,error}=await db.auth.signInAnonymously();if(error)throw error;user=data.user||(data.session&&data.session.user);return user}
+async function openSupport(){$('#supportPanel').classList.add('open');supportGateUI();try{const u=await chatUser();const {data,error}=await db.from('support_conversations').select('*').eq('user_id',u.id).eq('status','open').order('created_at',{ascending:false}).limit(1).maybeSingle();if(error)throw error;if(data)supportConversation=data;else{const made=await db.from('support_conversations').insert({user_id:u.id,visitor_email:u.email||null,status:'open'}).select().single();if(made.error)throw made.error;supportConversation=made.data}await loadSupportMessages()}catch(err){console.warn(err);supportNotice(/anonymous/i.test(err.message||'')?t('sp_anon'):/support_conversations|schema cache|does not exist/i.test(err.message||'')?t('sp_setup'):t('sp_down')+' ('+(err.message||'')+')')}}
 function supportNotice(s){const n=document.createElement('div');n.className='support-time';n.textContent=s;$('#supportMessages').append(n)}
 async function loadSupportMessages(){if(!supportConversation)return;const {data,error}=await db.from('support_messages').select('*').eq('conversation_id',supportConversation.id).order('created_at');if(error)throw error;const box=$('#supportMessages');box.innerHTML='';const w=document.createElement('div');w.className='support-welcome';w.textContent=t('sp_welcome');box.append(w);(data||[]).forEach(m=>{const b=document.createElement('div');b.className='support-bubble '+(m.sender==='staff'?'staff':'');b.textContent=m.body;box.append(b)});box.scrollTop=box.scrollHeight}
 $('#supportLogin').onclick=()=>{pendingSupport=true;pendingCheckout=false;authMode='in';openAuth();$('#authMsg').textContent=t('sp_need_login_msg')};
-$('#supportLaunch').onclick=()=>{$('#supportPanel').classList.contains('open')?$('#supportPanel').classList.remove('open'):openSupport()};$('#supportClose').onclick=()=>$('#supportPanel').classList.remove('open');setInterval(()=>{if($('#supportPanel').classList.contains('open')&&supportConversation&&loggedIn())loadSupportMessages().catch(()=>{})},8000);
-$('#supportForm').onsubmit=async e=>{e.preventDefault();const body=$('#supportInput').value.trim();if(!body)return;if(!loggedIn()){supportGateUI();return}try{if(!supportConversation)await openSupport();if(!supportConversation)return;const {error}=await db.from('support_messages').insert({conversation_id:supportConversation.id,sender:'visitor',body});if(error)throw error;await db.from('support_conversations').update({last_message_at:new Date().toISOString()}).eq('id',supportConversation.id);$('#supportInput').value='';await loadSupportMessages()}catch(err){supportNotice(t('sp_fail')+err.message)}};
+$('#supportLaunch').onclick=()=>{$('#supportPanel').classList.contains('open')?$('#supportPanel').classList.remove('open'):openSupport()};$('#supportClose').onclick=()=>$('#supportPanel').classList.remove('open');setInterval(()=>{if($('#supportPanel').classList.contains('open')&&supportConversation)loadSupportMessages().catch(()=>{})},8000);
+$('#supportForm').onsubmit=async e=>{e.preventDefault();const body=$('#supportInput').value.trim();if(!body)return;try{if(!supportConversation)await openSupport();if(!supportConversation)return;const {error}=await db.from('support_messages').insert({conversation_id:supportConversation.id,sender:'visitor',body});if(error)throw error;await db.from('support_conversations').update({last_message_at:new Date().toISOString()}).eq('id',supportConversation.id);$('#supportInput').value='';await loadSupportMessages()}catch(err){supportNotice(t('sp_fail')+err.message)}};
 
 /* ================= 3D HERO + SMOKE ================= */
 /* ---------- 3D vape device (real CSS 3D: stacked volumetric slices, no image, transparent background) ---------- */
@@ -791,12 +792,13 @@ async function loadCategoryImages(){try{if(!db)return;const {data,error}=await d
 $('#year').textContent=new Date().getFullYear();
 
 /* ================= PRODUCT ROWS: New arrivals, Best sellers, one row per category ================= */
-Object.assign(I,{rw_new_k:['JUST LANDED','وصل حديثاً'],rw_new:['New arrivals','وصل حديثاً'],rw_best_k:['CUSTOMER FAVOURITES','المفضّل لدى العملاء'],rw_best:['Best sellers','الأكثر مبيعاً'],rw_all:['Shop all','عرض الكل'],rw_prev:['Scroll left','تمرير لليسار'],rw_next:['Scroll right','تمرير لليمين'],rw_none:['Nothing here yet.','لا يوجد شيء هنا بعد.']});
+Object.assign(I,{sp_anon:['Chat is not switched on yet: in Supabase go to Authentication → Sign In / Providers and turn on "Allow anonymous sign-ins".','الدردشة غير مفعّلة بعد: من Supabase افتح Authentication ثم Sign In / Providers وفعّل Allow anonymous sign-ins.'],rw_new_k:['JUST LANDED','وصل حديثاً'],rw_new:['New arrivals','وصل حديثاً'],rw_best_k:['CUSTOMER FAVOURITES','المفضّل لدى العملاء'],rw_best:['Best sellers','الأكثر مبيعاً'],rw_all:['Shop all','عرض الكل'],rw_prev:['Scroll left','تمرير لليسار'],rw_next:['Scroll right','تمرير لليمين'],rw_none:['Nothing here yet.','لا يوجد شيء هنا بعد.']});
 const ROW_ARROW={l:'<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',r:'<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>'};
 function rowCard(p){const img=p.image_url||fallbackProductImage(p),out=Number(p.stock)<=0,dc=Number(p.discount_percent)||0,vs=variantsOf(p);
 return `<article class="product ${out?'soldout':''}" data-product="${p.id}" tabindex="0" role="button" aria-label="${safe(p.name)}"><div class="product-img"><span class="tag">${p.is_new?t('newtag'):safe(catLabel(p.category))}</span>${out?`<span class="p-badge sold">${t('sold_out')}</span>`:dc>0?`<span class="p-badge off">-${dc}%</span>`:''}${img?`<img src="${safe(img)}" alt="${safe(p.name)}" loading="lazy" onerror="this.remove()">`:device()}</div><div class="product-info"><small>${safe(catLabel(p.category))}</small><h3>${safe(p.name)}</h3>${vs.length>1?`<div class="p-dots">${vs.slice(0,6).map(v=>`<i style="${swStyle(v)}" title="${safe(v.name)}"></i>`).join('')}</div>`:''}<div class="product-bottom"><span class="price ${dc>0&&!out?'sale':''}">${dc>0?`<del style="display:block;color:#80918f;font-size:11px">${money(p.price)}</del>`:''}${money(price(p))}</span><button class="add" data-add="${p.id}" aria-label="+" ${out?'disabled':''}>+</button></div><small style="display:block;margin-top:12px;color:var(--mint)">${t('details_link')}</small></div></article>`}
-function rowBlock(id,kick,title,list,cat){
-return `<div class="prow" data-row="${id}"><div class="prow-head"><div>${kick?`<div class="kicker">${kick}</div>`:''}<h2>${title}</h2></div><div class="prow-ctrl">${cat?`<button type="button" class="prow-all" data-rowall="${cat}">${t('rw_all')} ↗</button>`:''}<button type="button" class="prow-arrow" data-rowdir="-1" aria-label="${t('rw_prev')}">${ROW_ARROW.l}</button><button type="button" class="prow-arrow" data-rowdir="1" aria-label="${t('rw_next')}">${ROW_ARROW.r}</button></div></div>${list.length?`<div class="prow-track">${list.map(rowCard).join('')}</div>`:`<p class="prow-empty">${t('rw_none')}</p>`}</div>`}
+function rowBlock(id,kick,title,list,cat,moving){
+const ctrl=moving?`<div class="prow-ctrl">${cat?`<button type="button" class="prow-all" data-rowall="${cat}">${t('rw_all')} ↗</button>`:''}<button type="button" class="prow-arrow" data-rowdir="-1" aria-label="${t('rw_prev')}">${ROW_ARROW.l}</button><button type="button" class="prow-arrow" data-rowdir="1" aria-label="${t('rw_next')}">${ROW_ARROW.r}</button></div>`:(cat?`<div class="prow-ctrl"><button type="button" class="prow-all" data-rowall="${cat}">${t('rw_all')} ↗</button></div>`:'');
+return `<div class="prow" data-row="${id}"${moving?' data-auto="1"':''}><div class="prow-head"><div>${kick?`<div class="kicker">${kick}</div>`:''}<h2>${title}</h2></div>${ctrl}</div>${list.length?`<div class="prow-track">${list.map(rowCard).join('')}</div>`:`<p class="prow-empty">${t('rw_none')}</p>`}</div>`}
 function renderRows(){
   const box=$('#prowsBox');if(!box)return;
   const sorted=products.slice();
@@ -806,12 +808,12 @@ function renderRows(){
   const rows=[];
   if(news.length)rows.push(rowBlock('new',t('rw_new_k'),t('rw_new'),news.slice(0,16)));
   if(best.length)rows.push(rowBlock('best',t('rw_best_k'),t('rw_best'),best.slice(0,16)));
-  [['pods','c1'],['coils','c2'],['disposables','c3'],['eliquid','cat_eliquid']].forEach(([k,lab])=>{
-    const l=sorted.filter(p=>catMatch(p,k));if(l.length)rows.push(rowBlock(k,'',t(lab),l.slice(0,16),k))});
+  [['pods','c1'],['disposables','c3'],['eliquid','cat_eliquid']].forEach(([k,lab])=>{
+    const l=sorted.filter(p=>catMatch(p,k));if(l.length)rows.push(rowBlock(k,'',t(lab),l.slice(0,16),k,true))});
   box.innerHTML=rows.join('');
   box.querySelectorAll('.prow').forEach(syncRowArrows);
 }
-function syncRowArrows(row){const tr=row.querySelector('.prow-track');if(!tr)return;const prev=row.querySelector('[data-rowdir="-1"]'),next=row.querySelector('[data-rowdir="1"]');
+function syncRowArrows(row){const tr=row.querySelector('.prow-track');if(!tr)return;const prev=row.querySelector('[data-rowdir="-1"]'),next=row.querySelector('[data-rowdir="1"]');if(!prev||!next)return;
   const max=tr.scrollWidth-tr.clientWidth-2,pos=Math.abs(tr.scrollLeft);prev.disabled=pos<=2;next.disabled=pos>=max}
 function slowScroll(el,delta){if(el._anim)cancelAnimationFrame(el._anim);const start=el.scrollLeft,max=el.scrollWidth-el.clientWidth,target=Math.max(0,Math.min(max,start+delta)),dur=1300,t0=performance.now();
   el.style.scrollBehavior='auto';el.style.scrollSnapType='none';
@@ -820,15 +822,35 @@ function slowScroll(el,delta){if(el._anim)cancelAnimationFrame(el._anim);const s
 document.addEventListener('click',e=>{
   const a=e.target.closest('[data-rowdir]');
   if(a){const row=a.closest('.prow'),tr=row.querySelector('.prow-track');if(!tr)return;const d=Number(a.dataset.rowdir);
-    slowScroll(tr,d*Math.max(230,tr.querySelector('.product')?tr.querySelector('.product').offsetWidth+16:300));return}
+    tr._dir=d;tr._pause=performance.now()+5000;slowScroll(tr,d*Math.max(230,tr.querySelector('.product')?tr.querySelector('.product').offsetWidth+16:300));return}
   const all=e.target.closest('[data-rowall]');
   if(all){category=all.dataset.rowall;$('#siteSearch').value='';renderProducts();goTo('shop')}
 });
 document.addEventListener('scroll',e=>{const tr=e.target;if(tr&&tr.classList&&tr.classList.contains('prow-track'))syncRowArrows(tr.closest('.prow'))},true);
 window.addEventListener('resize',()=>document.querySelectorAll('.prow').forEach(syncRowArrows));
+
+/* auto-scroll (slow, back and forth) for the category rows */
+(function(){const SPEED=38;let last=0;const vis=new WeakMap();
+const io=new IntersectionObserver(es=>es.forEach(e=>vis.set(e.target,e.isIntersecting)),{threshold:.15});
+const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function hold(e){const tr=e.target.closest&&e.target.closest('.prow-track');if(tr)tr._pause=performance.now()+4000}
+['pointerdown','touchstart','wheel','mouseover'].forEach(ev=>document.addEventListener(ev,hold,{passive:true}));
+document.addEventListener('mouseout',e=>{const tr=e.target.closest&&e.target.closest('.prow-track');if(tr)tr._pause=performance.now()+1500},{passive:true});
+function tick(now){const dt=Math.min(.05,(now-(last||now))/1000);last=now;
+  document.querySelectorAll('.prow[data-auto] .prow-track').forEach(tr=>{
+    if(!tr._seen){tr._seen=1;io.observe(tr);tr._dir=1;tr._pos=tr.scrollLeft;tr.style.scrollSnapType='none'}
+    if(reduce||!vis.get(tr)||tr._anim||now<(tr._pause||0)){tr._pos=tr.scrollLeft;return}
+    const max=tr.scrollWidth-tr.clientWidth;if(max<=2)return;
+    if(Math.abs(tr.scrollLeft-tr._pos)>2)tr._pos=tr.scrollLeft;
+    tr._pos+=tr._dir*SPEED*dt;
+    if(tr._pos>=max){tr._pos=max;tr._dir=-1;tr._pause=now+1200}
+    else if(tr._pos<=0){tr._pos=0;tr._dir=1;tr._pause=now+1200}
+    tr.style.scrollBehavior='auto';tr.scrollLeft=tr._pos});
+  requestAnimationFrame(tick)}
+requestAnimationFrame(tick)})();
 (function(){const _rp=renderProducts;renderProducts=function(){_rp.apply(this,arguments);renderRows()}})();
 applyLang();observe();loadProducts();loadSettings();loadCategoryImages();
-db?.auth.getSession().then(({data})=>user=data.session?.user||null);db?.auth.onAuthStateChange((_e,s)=>{user=s?.user||null;updateProfileBtn();try{supportGateUI()}catch(e){}});
+db?.auth.getSession().then(({data})=>user=data.session?.user||null);db?.auth.onAuthStateChange((_e,s)=>{user=s?.user||null;updateProfileBtn();if(supportConversation&&supportConversation.user_id!==(user&&user.id))supportConversation=null;try{supportGateUI()}catch(e){}});
 
 
 /* hero image drifts + fades gently while scrolling (like the desktop feel) */
