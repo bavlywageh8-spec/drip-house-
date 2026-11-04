@@ -388,6 +388,65 @@ mask-image:linear-gradient(to right,transparent 0,#000 34%),linear-gradient(to b
 #forgotPassword{color:var(--mint)}
 #recoverForm h3{margin:0 0 8px}#recoverForm p{color:var(--muted);font-size:13px;margin:0 0 16px}
 </style>
+<style>
+/* ===== HERO on phones & tablets: balanced two-column grid (text + device side by side) ===== */
+@media(max-width:900px){
+ .hero-wrap{display:grid!important;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);grid-template-rows:auto auto auto auto;align-items:center;column-gap:6px;
+  width:min(100% - 30px,var(--max));margin:0 auto;padding:20px 0 26px;overflow:visible!important;position:relative;isolation:isolate}
+ .hero-wrap .hero,.hero-wrap .hero-copy{display:contents!important}
+ .hero-copy>*{position:relative;z-index:2}
+ .hero-copy>.eyebrow{grid-column:1;grid-row:1;align-self:end;font-size:9.5px;letter-spacing:.16em;gap:8px;margin:0;min-width:0}
+ .hero-copy>.eyebrow:before{width:16px;flex:none}
+ .hero-copy h1,.hero h1{grid-column:1;grid-row:2;min-width:0;font-size:clamp(27px,8.4vw,44px)!important;line-height:1.06!important;letter-spacing:-.8px!important;margin:10px 0 10px!important;overflow-wrap:anywhere}
+ html[lang="ar"] .hero-copy h1,html[lang="ar"] .hero h1{letter-spacing:0!important;line-height:1.32!important}
+ .hero-copy>p{grid-column:1;grid-row:3;align-self:start;min-width:0;font-size:12.5px!important;line-height:1.75!important;margin:0!important;color:#a9bcb8;max-width:none}
+ html[lang="ar"] .hero-copy>p{line-height:1.95!important}
+ .hero-wrap .hero-bg{grid-column:2;grid-row:1/4;position:relative!important;inset:auto!important;top:auto!important;right:auto!important;bottom:auto!important;
+  width:calc(132% + 15px)!important;margin-left:-32%!important;margin-right:-15px!important;height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:1/1.08!important;align-self:center;order:0!important;overflow:hidden;z-index:0;
+  -webkit-mask-image:radial-gradient(ellipse 58% 55% at 54% 50%,#000 52%,transparent 100%)!important;mask-image:radial-gradient(ellipse 58% 55% at 54% 50%,#000 52%,transparent 100%)!important;
+  -webkit-mask-composite:source-over!important;mask-composite:add!important}
+ .hero-wrap .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:50% 50%!important}
+ .hero-wrap .hero-float{inset:0!important}
+ .hero-wrap .hero-glow{right:10%;top:10%;width:80%;height:80%}
+ .hero-copy>.cta{grid-column:1/-1;grid-row:4;width:100%;justify-content:center;margin:18px 0 0!important;font-size:14px;padding:14px 20px;box-sizing:border-box}
+}
+@media(max-width:380px){
+ .hero-copy>p{font-size:11.5px!important}
+ .hero-copy h1,.hero h1{font-size:26px!important}
+}
+@media(min-width:621px) and (max-width:900px){
+ .hero-wrap{padding:34px 0 40px;column-gap:20px}
+ .hero-copy h1,.hero h1{font-size:clamp(40px,7vw,56px)!important}
+ .hero-copy>p{font-size:15px!important;max-width:420px}
+ .hero-copy>.eyebrow{font-size:11px}
+ .hero-wrap .hero-bg{width:100%!important;margin-left:0!important;aspect-ratio:1/.9!important}
+ .hero-copy>.cta{width:auto;justify-self:start;margin-top:22px!important}
+}
+</style>
+<style>
+/* tablet: use the same compact header so nothing overflows sideways */
+@media(min-width:621px) and (max-width:900px){
+ header{height:auto}
+ .nav{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 0}
+ .actions{display:contents}
+ .brand{order:1;flex:1 1 auto}
+ #menuBtn{order:2;width:42px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+ #menuBtn svg{width:22px;height:22px}
+ .site-search{order:3;flex:1 1 220px;min-width:0;width:auto;margin:0}
+ #accountBtn{order:4}
+ #cartBtn{order:5}
+ #langBtn{display:none}
+ #accountBtn,#cartBtn{width:42px;min-width:42px;padding:0;display:inline-flex;align-items:center;justify-content:center;position:relative}
+ #cartBtn .cart-word{display:none}
+ #cartBtn .cart-ic{display:block}
+ #cartBtn .cart-count{position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:99px;background:var(--mint);color:#06221b;font-size:11px;font-weight:800;display:grid;place-items:center;margin:0}
+ .nav .links{display:none;order:6;width:100%;flex-direction:column;gap:4px;padding:8px;margin-top:2px;border:1px solid var(--line);border-radius:18px;background:#0c1516f2}
+ .nav .links.open{display:flex}
+ .nav .links a{display:block;padding:13px 14px;border-radius:12px;font-size:14px;color:#dbe8e5}
+ .nav .links a:active{background:#122b29;color:var(--mint)}
+ .links-lang{display:block;margin-top:4px;border:1px solid #65f2d04c;background:#122b29;color:var(--mint);border-radius:12px;padding:13px 14px;font-weight:700;font-size:14px;text-align:center;cursor:pointer}
+}
+</style>
 </head>
 <body class="noise">
 <div class="bg-fx" aria-hidden="true"><div class="grid"></div><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="mist m1"></i><i class="mist m2"></i></div>
@@ -878,8 +937,7 @@ applyLang();observe();loadProducts();loadSettings();loadCategoryImages();
 (async()=>{if(!db)return;try{if(localStorage.getItem('dh_remember')==='0'&&!sessionStorage.getItem('dh_alive'))await db.auth.signOut({scope:'local'})}catch(e){}const {data}=await db.auth.getSession();if(!recovering)user=data.session?.user||null;try{updateProfileBtn();renderAuth()}catch(e){}})();db?.auth.onAuthStateChange((_e,s)=>{user=s?.user||null;if(_e==='PASSWORD_RECOVERY')setTimeout(startRecovery,0);updateProfileBtn();if(supportConversation&&supportConversation.user_id!==(user&&user.id))supportConversation=null;try{supportGateUI()}catch(e){}});
 
 
-/* hero image drifts + fades gently while scrolling (like the desktop feel) */
-(function(){const hb=document.querySelector('.hero-bg');if(!hb)return;let tk=false;const f=()=>{tk=false;if(innerWidth>900){hb.style.removeProperty('--py');return}const y=Math.min(scrollY,700);hb.style.transform='translateY('+(y*.18)+'px)';hb.style.opacity=String(Math.max(.25,1-y/900))};addEventListener('scroll',()=>{if(!tk){tk=true;requestAnimationFrame(f)}},{passive:true});addEventListener('resize',f)})();
+
 </script>
 <script>
 /* anonymous visit counter (feeds Admin > Website analytics) */
