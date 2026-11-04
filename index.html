@@ -371,6 +371,13 @@ mask-image:linear-gradient(to right,transparent 0,#000 34%),linear-gradient(to b
 .prow-empty{color:var(--muted);font-size:13px;padding:10px 0}
 @media(max-width:900px){.prow-track .product{flex-basis:calc((100% - 16px)/2)}}
 @media(max-width:620px){.prow-track{gap:10px}.prow-track .product{flex-basis:70%;min-width:0}.prow-arrow{width:36px;height:36px}.prow-all{padding:8px 14px}}
+
+.prow-stage{position:relative}
+.prow-stage .prow-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:46px;height:46px;background:#0b1214e6;border-color:#65f2d055;box-shadow:0 6px 22px #000a;backdrop-filter:blur(4px)}
+.prow-stage .prow-arrow.pa-l{left:-14px}.prow-stage .prow-arrow.pa-r{right:-14px}
+.prow-stage .prow-arrow:hover:not(:disabled){transform:translateY(-50%) scale(1.1);background:#65f2d022}
+.prow-stage .prow-arrow:active:not(:disabled){transform:translateY(-50%) scale(.94)}
+@media(max-width:620px){.prow-stage .prow-arrow{width:38px;height:38px}.prow-stage .prow-arrow.pa-l{left:-6px}.prow-stage .prow-arrow.pa-r{right:-6px}}
 </style>
 </head>
 <body class="noise">
@@ -792,13 +799,14 @@ async function loadCategoryImages(){try{if(!db)return;const {data,error}=await d
 $('#year').textContent=new Date().getFullYear();
 
 /* ================= PRODUCT ROWS: New arrivals, Best sellers, one row per category ================= */
-Object.assign(I,{sp_anon:['Chat is not switched on yet: in Supabase go to Authentication → Sign In / Providers and turn on "Allow anonymous sign-ins".','الدردشة غير مفعّلة بعد: من Supabase افتح Authentication ثم Sign In / Providers وفعّل Allow anonymous sign-ins.'],rw_new_k:['JUST LANDED','وصل حديثاً'],rw_new:['New arrivals','وصل حديثاً'],rw_best_k:['CUSTOMER FAVOURITES','المفضّل لدى العملاء'],rw_best:['Best sellers','الأكثر مبيعاً'],rw_all:['Shop all','عرض الكل'],rw_prev:['Scroll left','تمرير لليسار'],rw_next:['Scroll right','تمرير لليمين'],rw_none:['Nothing here yet.','لا يوجد شيء هنا بعد.']});
+Object.assign(I,{sp_anon:['Chat is not switched on yet: in Supabase go to Authentication → Sign In / Providers and turn on "Allow anonymous sign-ins".','الدردشة غير مفعّلة بعد: من Supabase افتح Authentication ثم Sign In / Providers وفعّل Allow anonymous sign-ins.'],rw_new_k:['JUST LANDED','وصل حديثاً'],rw_new:['New arrivals','وصل حديثاً'],rw_best_k:['CUSTOMER FAVOURITES','المفضّل لدى العملاء'],rw_best:['Best sellers','الأكثر مبيعاً'],rw_all:['Shop now','تسوق الآن'],rw_prev:['Scroll left','تمرير لليسار'],rw_next:['Scroll right','تمرير لليمين'],rw_none:['Nothing here yet.','لا يوجد شيء هنا بعد.']});
 const ROW_ARROW={l:'<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',r:'<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>'};
 function rowCard(p){const img=p.image_url||fallbackProductImage(p),out=Number(p.stock)<=0,dc=Number(p.discount_percent)||0,vs=variantsOf(p);
 return `<article class="product ${out?'soldout':''}" data-product="${p.id}" tabindex="0" role="button" aria-label="${safe(p.name)}"><div class="product-img"><span class="tag">${p.is_new?t('newtag'):safe(catLabel(p.category))}</span>${out?`<span class="p-badge sold">${t('sold_out')}</span>`:dc>0?`<span class="p-badge off">-${dc}%</span>`:''}${img?`<img src="${safe(img)}" alt="${safe(p.name)}" loading="lazy" onerror="this.remove()">`:device()}</div><div class="product-info"><small>${safe(catLabel(p.category))}</small><h3>${safe(p.name)}</h3>${vs.length>1?`<div class="p-dots">${vs.slice(0,6).map(v=>`<i style="${swStyle(v)}" title="${safe(v.name)}"></i>`).join('')}</div>`:''}<div class="product-bottom"><span class="price ${dc>0&&!out?'sale':''}">${dc>0?`<del style="display:block;color:#80918f;font-size:11px">${money(p.price)}</del>`:''}${money(price(p))}</span><button class="add" data-add="${p.id}" aria-label="+" ${out?'disabled':''}>+</button></div><small style="display:block;margin-top:12px;color:var(--mint)">${t('details_link')}</small></div></article>`}
 function rowBlock(id,kick,title,list,cat,moving){
-const ctrl=moving?`<div class="prow-ctrl">${cat?`<button type="button" class="prow-all" data-rowall="${cat}">${t('rw_all')} ↗</button>`:''}<button type="button" class="prow-arrow" data-rowdir="-1" aria-label="${t('rw_prev')}">${ROW_ARROW.l}</button><button type="button" class="prow-arrow" data-rowdir="1" aria-label="${t('rw_next')}">${ROW_ARROW.r}</button></div>`:(cat?`<div class="prow-ctrl"><button type="button" class="prow-all" data-rowall="${cat}">${t('rw_all')} ↗</button></div>`:'');
-return `<div class="prow" data-row="${id}"${moving?' data-auto="1"':''}><div class="prow-head"><div>${kick?`<div class="kicker">${kick}</div>`:''}<h2>${title}</h2></div>${ctrl}</div>${list.length?`<div class="prow-track">${list.map(rowCard).join('')}</div>`:`<p class="prow-empty">${t('rw_none')}</p>`}</div>`}
+const shop=cat?`<div class="prow-ctrl"><button type="button" class="prow-all" data-rowall="${cat}">${t('rw_all')} ↗</button></div>`:'';
+const arrows=moving?`<button type="button" class="prow-arrow pa-l" data-rowdir="-1" aria-label="${t('rw_prev')}">${ROW_ARROW.l}</button><button type="button" class="prow-arrow pa-r" data-rowdir="1" aria-label="${t('rw_next')}">${ROW_ARROW.r}</button>`:'';
+return `<div class="prow" data-row="${id}"${moving?' data-auto="1"':''}><div class="prow-head"><div>${kick?`<div class="kicker">${kick}</div>`:''}<h2>${title}</h2></div>${shop}</div>${list.length?`<div class="prow-stage">${arrows}<div class="prow-track">${list.map(rowCard).join('')}</div></div>`:`<p class="prow-empty">${t('rw_none')}</p>`}</div>`}
 function renderRows(){
   const box=$('#prowsBox');if(!box)return;
   const sorted=products.slice();
@@ -813,7 +821,7 @@ function renderRows(){
   box.innerHTML=rows.join('');
   box.querySelectorAll('.prow').forEach(syncRowArrows);
 }
-function syncRowArrows(row){const tr=row.querySelector('.prow-track');if(!tr)return;const prev=row.querySelector('[data-rowdir="-1"]'),next=row.querySelector('[data-rowdir="1"]');if(!prev||!next)return;
+function syncRowArrows(row){if(row.dataset.auto)return;const tr=row.querySelector('.prow-track');if(!tr)return;const prev=row.querySelector('[data-rowdir="-1"]'),next=row.querySelector('[data-rowdir="1"]');if(!prev||!next)return;
   const max=tr.scrollWidth-tr.clientWidth-2,pos=Math.abs(tr.scrollLeft);prev.disabled=pos<=2;next.disabled=pos>=max}
 function slowScroll(el,delta){if(el._anim)cancelAnimationFrame(el._anim);const start=el.scrollLeft,max=el.scrollWidth-el.clientWidth,target=Math.max(0,Math.min(max,start+delta)),dur=1300,t0=performance.now();
   el.style.scrollBehavior='auto';el.style.scrollSnapType='none';
