@@ -152,6 +152,17 @@ td small{color:var(--muted);font-size:11px}td a{text-decoration:none;color:var(-
 .fl select.field{appearance:none;-webkit-appearance:none;background:#08100f url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23fff' fill='none' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 20px center;padding-right:44px}
 .fee-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fee-row .field{border-radius:99px;padding:16px 22px;font-size:15px}.fee-row .btn.big{border-radius:99px;justify-content:center;padding:16px}.fee-card .fl>span{font-size:15px}
 </style>
+<style>
+#anSec{margin-top:18px;display:grid;gap:16px}
+.an-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}.an-head h3{font:600 20px "Space Grotesk";letter-spacing:-.5px;margin:0}.an-head small{color:var(--muted);font-size:12px}
+.an-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.an-stats .stat{padding:16px 18px}.an-stats .b{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}.an-stats .b strong{flex-basis:100%;font:700 28px "Space Grotesk";letter-spacing:-1px}
+.an-s{color:var(--muted);font-size:10px}
+.an-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px}
+.an-pages{display:grid;gap:14px}.an-pg{display:flex;gap:12px;align-items:center}.an-rank{width:26px;height:26px;border-radius:9px;background:#65f2d014;color:var(--mint);display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.an-nm{flex:1;min-width:0}.an-row{display:flex;justify-content:space-between;gap:10px;font-size:13px}.an-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.an-nm small{color:var(--muted);font-size:10px}
+.an-foot{color:var(--muted);font-size:11px;margin:0 4px}
+@media(max-width:1100px){.an-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.an-grid{grid-template-columns:1fr}}
+</style>
 </head><body>
 <div class="smoke" aria-hidden="true"></div>
 <div id="login" class="login"><div class="login-card"><div class="brand" style="font-size:23px">DRIP<span>HOUSE</span></div><h1>Admin studio.</h1><p>Sign in with an authorised Driphouse administrator account to manage the store.</p><form id="loginForm"><input class="field" type="email" name="email" placeholder="Admin email" required><input class="field" type="password" name="password" placeholder="Password" required><button class="btn">Sign in securely</button><div id="loginMsg" class="msg"></div></form></div></div>
@@ -251,7 +262,41 @@ return `<div class="dash"><div class="col"><div class="stats">${stat('Total reve
 <div class="col side"><section class="card"><div class="card-head"><h3>Payment methods</h3><span>${valid().length} orders</span></div>${donut()}</section>
 <section class="card"><div class="card-head"><h3>Inventory alerts</h3><span>${low.length} alert${low.length===1?'':'s'}</span></div><div class="list">${alerts.map(p=>`<div class="li"><span class="thumb">${esc((p.name||'?')[0].toUpperCase())}</span><div class="n">${esc(p.name)}</div><span class="badge ${Number(p.stock)<=0?'bad':'warn'}">${Number(p.stock)<=0?'Out':p.stock+' left'}</span></div>`).join('')||'<div class="empty">Your inventory is looking healthy.</div>'}</div></section>
 <section class="card"><div class="card-head"><h3>Top governorates</h3><span>By revenue</span></div><div class="list">${gl.map(([k,x])=>`<div class="li" style="display:block"><div style="display:flex;justify-content:space-between;font-size:12px"><span>${esc(k)}</span><b>${money(x.t)}</b></div><div class="track"><i style="width:${Math.max(4,x.t/gmax*100)}%"></i></div></div>`).join('')||'<div class="empty">No deliveries yet.</div>'}</div></section></div></div>
-<section class="card"><div class="card-head"><h3>Recent orders</h3><button class="btn ghost small" data-goto="orders">View all</button></div>${ordersTable(orders.slice(0,6))}</section>`}
+<section class="card"><div class="card-head"><h3>Recent orders</h3><button class="btn ghost small" data-goto="orders">View all</button></div>${ordersTable(orders.slice(0,6))}</section><div id="anSec"></div>`}
+
+/* ---------- website analytics (under Recent orders) ---------- */
+let anDays=7,anData=null;
+const anHour=h=>`${h%12===0?12:h%12}:00 ${h<12?'AM':'PM'}`;
+const anPct=(c,p)=>{if(!p)return c?['new','']:['0%','flat'];const d=(c-p)/p*100;return[(d>=0?'▲ ':'▼ ')+Math.abs(d).toFixed(0)+'%',d>=0?'':'down']};
+function anLine(days){const W=1100,H=300,L=40,R=14,T=14,B=38,iw=W-L-R,ih=H-T-B,n=days.length,mx=Math.max(4,Math.ceil(Math.max(1,...days.map(d=>d.views),...days.map(d=>d.visitors))/4)*4),
+x=i=>L+(n===1?iw/2:i*iw/(n-1)),y=v=>T+ih-v/mx*ih,sm=k=>{let p=`M${x(0)},${y(days[0][k])}`;for(let i=1;i<n;i++){const a=x(i-1),b=x(i),m=(a+b)/2;p+=` C${m},${y(days[i-1][k])} ${m},${y(days[i][k])} ${b},${y(days[i][k])}`}return p},
+area=k=>`${sm(k)} L${x(n-1)},${T+ih} L${x(0)},${T+ih} Z`,grid=[0,1,2,3,4].map(i=>{const v=mx/4*i,yy=y(v);return `<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="#1b2b29"/><text x="${L-8}" y="${yy+3}" text-anchor="end" fill="#84a09b" font-size="10">${Math.round(v)}</text>`}).join(''),
+step=Math.ceil(n/8),lab=days.map((d,i)=>{if(i%step&&i!==n-1)return'';const dt=new Date(d.d+'T12:00:00');return `<text x="${x(i)}" y="${H-16}" text-anchor="middle" fill="#84a09b" font-size="10">${dt.toLocaleDateString('en',{month:'short',day:'numeric'})}</text><text x="${x(i)}" y="${H-3}" text-anchor="middle" fill="#5d7a76" font-size="9">${dt.toLocaleDateString('en',{weekday:'short'})}</text>`}).join('');
+return `<svg viewBox="0 0 ${W} ${H}"><defs><linearGradient id="anG1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#65f2d0" stop-opacity=".30"/><stop offset="1" stop-color="#65f2d0" stop-opacity="0"/></linearGradient><linearGradient id="anG2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#1c8f79" stop-opacity=".35"/><stop offset="1" stop-color="#1c8f79" stop-opacity="0"/></linearGradient></defs>${grid}
+<path d="${area('views')}" fill="url(#anG1)"/><path d="${area('visitors')}" fill="url(#anG2)"/>
+<path d="${sm('views')}" fill="none" stroke="#a9f5e2" stroke-width="2.2" stroke-linecap="round"/><path d="${sm('visitors')}" fill="none" stroke="#65f2d0" stroke-width="2.6" stroke-linecap="round"/>
+${days.map((d,i)=>`<circle cx="${x(i)}" cy="${y(d.views)}" r="3.4" fill="#a9f5e2"><title>${d.d}: ${d.views} page views</title></circle><circle cx="${x(i)}" cy="${y(d.visitors)}" r="3.8" fill="#65f2d0" stroke="#0a1211" stroke-width="1.5"><title>${d.d}: ${d.visitors} visitors</title></circle>`).join('')}${lab}</svg>`}
+function anBars(hrs){const W=720,H=230,L=36,R=8,T=12,B=26,iw=W-L-R,ih=H-T-B,mx=Math.max(4,Math.ceil(Math.max(1,...hrs)/4)*4),bw=iw/24,mxv=Math.max(...hrs);
+const grid=[0,1,2,3,4].map(i=>{const v=mx/4*i,yy=T+ih-v/mx*ih;return `<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="#1b2b29"/><text x="${L-7}" y="${yy+3}" text-anchor="end" fill="#84a09b" font-size="10">${Math.round(v)}</text>`}).join('');
+const bars=hrs.map((v,h)=>{const bh=Math.max(v?3:1.5,v/mx*ih),peak=v&&v===mxv;return `<rect x="${L+h*bw+bw*.2}" y="${T+ih-bh}" width="${bw*.6}" height="${bh}" rx="3" fill="${peak?'#65f2d0':v?'#1c8f79':'#1d2e2c'}"><title>${anHour(h)}: ${v} views</title></rect>`}).join('');
+const lab=[0,4,8,12,16,20].map(h=>`<text x="${L+h*bw+bw/2}" y="${H-7}" text-anchor="middle" fill="#84a09b" font-size="10">${anHour(h).replace(':00','')}</text>`).join('');
+return `<svg viewBox="0 0 ${W} ${H}">${grid}${bars}${lab}</svg>`}
+function anHTML(){const a=anData;if(!a)return'<div class="empty">Loading analytics…</div>';
+const hrs=(a.hours&&a.hours.length===24)?a.hours:Array(24).fill(0),tot=hrs.reduce((s,v)=>s+v,0),mxv=Math.max(...hrs),mnv=Math.min(...hrs),pk=hrs.indexOf(mxv),qt=hrs.indexOf(mnv),avg=tot/24,
+pkd=avg?Math.round((mxv/avg-1)*100):0,dV=anPct(a.cur.visitors,a.prev.visitors),dP=anPct(a.cur.views,a.prev.views),pages=a.pages||[],pmx=Math.max(1,...pages.map(p=>p.views));
+const I={u:IC.user,e:'<svg viewBox="0 0 24 24"><path d="M2 12s3.600-7 10-7 10 7 10 7-3.600 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',c:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',m:'<svg viewBox="0 0 24 24"><path d="M20 14.500A8.500 8.500 0 1 1 9.500 4a7 7 0 0 0 10.500 10.500z"/></svg>'};
+const st=(l,ic,v,sub)=>`<div class="stat"><div class="t"><span>${l}</span><span class="ico">${ic}</span></div><div class="b"><strong>${v}</strong>${sub}</div></div>`;
+return `<div class="an-head"><div><h3>Website analytics</h3><small>Visitors and page views on your storefront</small></div><select class="select" id="anSel">${[7,14,30].map(n=>`<option value="${n}" ${anDays===n?'selected':''}>Last ${n} days</option>`).join('')}</select></div>
+<div class="an-stats">${st('Total visitors',I.u,a.cur.visitors,`<span class="chip ${dV[1]}">${dV[0]}</span><small class="an-s">vs. previous ${anDays} days</small>`)}${st('Page views',I.e,a.cur.views,`<span class="chip ${dP[1]}">${dP[0]}</span><small class="an-s">vs. previous ${anDays} days</small>`)}${st('Peak traffic',I.c,tot?anHour(pk):'—',tot?`<span class="chip ${pkd>=0?'':'down'}">${pkd>=0?'▲ ':'▼ '}${Math.abs(pkd)}%</span><small class="an-s">vs. average · ${mxv} views</small>`:'<small class="an-s">No visits yet</small>')}${st('Quietest time',I.m,tot?anHour(qt):'—',tot?`<span class="chip flat">${mnv} visits</span><small class="an-s">lowest hour</small>`:'<small class="an-s">No visits yet</small>')}</div>
+<section class="card"><div class="card-head"><h3>Visitors over time</h3></div><div class="legend"><span><i style="background:#65f2d0"></i>Visitors</span><span><i style="background:#a9f5e2"></i>Page views</span></div><div class="chart-box" style="height:auto">${anLine(a.days||[])}</div></section>
+<div class="an-grid"><section class="card"><div class="card-head"><h3>Traffic by hour</h3><span>Alexandria time</span></div><div class="chart-box" style="height:230px">${anBars(hrs)}</div></section>
+<section class="card"><div class="card-head"><h3>Top pages</h3><span>${pages.length} shown</span></div><div class="an-pages">${pages.map((p,i)=>`<div class="an-pg"><span class="an-rank">${i+1}</span><div class="an-nm"><div class="an-row"><span>${esc(p.page)}</span><b>${p.views}</b></div><div class="track"><i style="width:${Math.max(4,p.views/pmx*100)}%"></i></div><small>${p.visitors} visitor${p.visitors==1?'':'s'}</small></div></div>`).join('')||'<div class="empty">Page visits will appear here as shoppers browse your store.</div>'}</div></section></div>
+<p class="an-foot">Updated ${esc(a.updated||'')} · times in Alexandria (Africa/Cairo)</p>`}
+async function loadAnalytics(){const el=document.getElementById('anSec');if(!el)return;if(anData)el.innerHTML=anHTML();
+try{const {data,error}=await db.rpc('dh_site_analytics',{p_days:anDays});if(error)throw error;anData=data}catch(e){const el2=document.getElementById('anSec');if(el2&&!anData)el2.innerHTML=`<section class="card"><div class="card-head"><h3>Website analytics</h3></div><div class="empty">Analytics isn’t ready yet — run <b>driphouse_update_v6.sql</b> in Supabase (SQL Editor), then refresh.</div></section>`;return}
+const el3=document.getElementById('anSec');if(el3)el3.innerHTML=anHTML()}
+document.addEventListener('change',e=>{if(e.target.id==='anSel'){anDays=Number(e.target.value);anData=null;const el=document.getElementById('anSec');if(el)el.innerHTML=anHTML();loadAnalytics()}});
+const _anRender=render;render=function(){_anRender.apply(this,arguments);if(view==='overview')loadAnalytics()};
 
 /* ---------- products ---------- */
 const PER=6;let catPage=1;
