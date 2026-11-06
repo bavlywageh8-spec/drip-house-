@@ -393,8 +393,7 @@ function offersView(){
   <td><div class="row-actions"><button class="pb" data-edit-offer="${esc(o.id)}">Edit</button><button class="pb" data-toggle-offer="${esc(o.id)}">${o.is_active?'Disable':'Enable'}</button><button class="pb del" data-delete-offer="${esc(o.id)}">Delete</button></div></td>
  </tr>`).join('');
  return (siteOffersErr?`<div class="note" style="margin-bottom:16px">Offers database is not ready (${esc(siteOffersErr)}). Run <b>site_offers_migration.sql</b> in Supabase SQL Editor, then refresh Admin.</div>`:'')+
- `<div class="sec-head"><span class="sec-ico">${ICO.pct}</span><div><h2>Homepage offers</h2><p>Manage the promotional banner shown on the public homepage.</p></div></div>
- <section class="card glass"><div class="card-head"><h3>Create or edit an offer</h3><span>Only enabled offers within their schedule appear on the storefront.</span></div>
+ `<section class="card glass"><div class="card-head"><h3>Create or edit an offer</h3><span>Only enabled offers within their schedule appear on the storefront.</span></div>
  <form id="siteOfferForm" class="offer-form">
   <input type="hidden" name="id">
   <label>Offer title<input class="field" name="title" maxlength="120" placeholder="Get 15% OFF" required></label>
