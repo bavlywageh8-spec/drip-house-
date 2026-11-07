@@ -680,8 +680,11 @@ footer .footer-grid button.fl{line-height:2.2}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .newsletter-status{min-height:16px;margin:9px 5px 0;color:var(--mint);font-size:11px;line-height:1.5}
 .newsletter-status.error{color:#ffaaaa}
-.footer-channel-link{display:inline-flex;align-items:center;gap:6px;margin-top:8px;color:var(--muted);font-size:11px;transition:color .2s}
-.footer-channel-link:hover{color:var(--muted)!important}
+.footer-social-links{display:flex;align-items:center;gap:10px;margin-top:17px}
+.footer-social-links a{display:grid;place-items:center;width:32px;height:32px;border:1px solid #ffffff24;border-radius:50%;background:#050707;color:#fff;transition:transform .2s,border-color .2s,background .2s}
+.footer-social-links a:hover{transform:translateY(-2px);border-color:var(--mint);background:var(--mint);color:#07110f}
+.footer-social-links svg{width:16px;height:16px;fill:currentColor}
+.footer-social-links .social-outline{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 footer .copyright{margin-top:42px;padding-top:20px;border-top:1px solid #65f2d01b}
 @media(max-width:900px){
  footer .footer-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:30px}
@@ -869,8 +872,6 @@ footer{background:linear-gradient(120deg,#030d0c,#071312 55%,#04100f);border-top
 ::selection{background:#68f2d2;color:#03221b}
 .prow-track-featured{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px!important;overflow:visible!important;scroll-snap-type:none!important}
 .prow-track-featured .product{flex:initial!important;min-width:0!important;width:auto!important;scroll-snap-align:none}
-footer .footer-brand .footer-channel-link{display:inline-flex;margin-top:12px;color:var(--muted)}
-footer .footer-brand .footer-channel-link:hover{color:var(--muted)!important}
 @media(max-width:620px){.prow-track-featured{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px!important}}
 body.category-page-open main>:not(#categoryPage){display:none!important}
 .product-img{height:auto;grid-template-columns:1fr;grid-template-rows:235px auto}
@@ -935,10 +936,6 @@ body.category-page-open main>:not(#categoryPage){display:none!important}
 <style>
 .review-section{margin:28px 0 4px;padding-top:24px;border-top:1px solid #65f2d022}.review-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.review-head h3{margin:0;font:600 19px "Space Grotesk";color:var(--white)}.review-summary{color:var(--gold);font-size:13px}.review-list{display:grid;gap:10px;margin-bottom:20px}.review-entry{padding:13px 15px;border:1px solid #65f2d018;border-radius:14px;background:#080e0d}.review-entry-head{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:11px}.review-stars{color:var(--gold);letter-spacing:2px}.review-entry p{margin:8px 0 0;color:#d4e0de;font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}.review-form{display:grid;gap:11px;padding:15px;border:1px solid #65f2d020;border-radius:15px;background:#0a1312}.review-form h4{margin:0;color:var(--white);font:600 14px "Space Grotesk"}.review-form label,.review-rating-label{display:grid;gap:6px;color:var(--muted);font-size:11px}.review-form input,.review-form textarea{width:100%;background:#08100f;color:var(--white);border:1px solid #65f2d02b;border-radius:10px;padding:10px 12px;font:inherit;outline:none}.review-form textarea{resize:vertical;min-height:84px}.review-form input:focus,.review-form textarea:focus{border-color:var(--mint)}.review-rating{display:flex;gap:5px}.review-rating button{border:0;background:transparent;padding:2px;color:#51625f;font-size:24px;line-height:1;cursor:pointer}.review-rating button.on,.review-rating button:hover{color:var(--gold)}.review-status{min-height:16px;color:var(--mint);font-size:11px}.review-status.error{color:#ff9292}.review-empty{color:var(--muted);font-size:12px}
 @media(max-width:600px){.review-head{align-items:flex-start;flex-direction:column}.review-form{padding:12px}}
-</style>
-<style>
-footer .footer-brand .footer-channel-link{display:inline-flex!important;align-items:center;gap:8px;margin-top:14px;padding:10px 16px;border:1px solid #25d36677;border-radius:99px;background:#0b2119;color:#25d366!important;font-weight:700;font-size:12px;text-decoration:none;cursor:pointer;position:relative;z-index:5;pointer-events:auto!important}
-footer .footer-brand .footer-channel-link:hover{background:#25d366;color:#052414!important}
 </style>
 <style>
 #communityReviewThanks:not([hidden]){display:block;text-align:center;font:700 34px/1.3 "Space Grotesk",Inter,Arial,sans-serif;color:var(--mint);padding:48px 16px 40px;min-height:0}
@@ -1049,7 +1046,11 @@ footer .footer-brand .footer-channel-link:hover{background:#25d366;color:#052414
 </section>
 </main>
 <footer id="contact"><div class="wrap"><div class="footer-grid">
-<div class="footer-brand"><a class="brand footer-logo" href="#">DRIP<span>HOUSE</span></a><p data-i="f_p">Vape smarter. Live better.</p><a class="footer-channel-link" href="https://www.whatsapp.com/channel/0029Vb8ZC8B2ER6pWHyNdV3s" target="_blank" rel="noopener" data-i="f_wa">WhatsApp channel ↗</a></div>
+<div class="footer-brand"><a class="brand footer-logo" href="#">DRIP<span>HOUSE</span></a><p data-i="f_p">Vape smarter. Live better.</p><div class="footer-social-links" aria-label="Social media">
+<a href="https://www.facebook.com/profile.php?id=61584038002995&amp;rdid=9HXJ3iI6sjxCuWWV&amp;share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1KGpmY68dK%2F" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-7.5H16l.4-3h-2.9V8.6c0-.9.3-1.5 1.5-1.5h1.5V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4.1v2.1H7.7v3h2.6V21z"/></svg></a>
+<a href="https://www.instagram.com/drip_house1111?cplk=MWo5aWNyMnFteWU0eQ==" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"><svg class="social-outline" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></svg></a>
+<a href="https://www.whatsapp.com/channel/0029Vb8ZC8B2ER6pWHyNdV3s" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp"><svg class="social-outline" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.6a8.4 8.4 0 0 1-12.4 7.3L3 20l1.2-4.9a8.4 8.4 0 1 1 16.3-3.5Z"/><path d="M8.2 7.8c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.8 1.8c.1.2.1.4 0 .6l-.6.7c-.2.2-.2.4-.1.6.4.8 1.2 1.6 2 2 .2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.7.8c.2.1.4.3.4.5 0 .3-.2 1.2-.8 1.6-.5.4-1.1.6-1.8.4-.7-.2-2.5-.9-4-2.4-1.2-1.2-2-2.7-2.2-3.4-.2-.7 0-1.3.3-1.7Z"/></svg></a>
+</div></div>
 <div><h4 data-i="f_explore">Quick Links</h4><button class="fl" data-act="home" data-i="nav_home">Home</button><button class="fl" data-act="categories" data-i="nav_cat">Categories</button><button class="fl" data-act="shop" data-i="nav_shop">Shop</button><button class="fl" data-act="story" data-i="nav_story">Our story</button></div>
 <div><h4 data-i="f_help">Customer Care</h4><button class="fl" data-act="delivery" data-i="f_delivery">Delivery information</button><button class="fl" data-act="support" data-i="f_support">Order support</button><button class="fl" data-act="contact" data-i="nav_contact">Contact</button></div>
 <div class="footer-newsletter"><h4 data-i="f_stay">Stay Updated</h4><p class="newsletter-copy" data-i="f_newsletter_p">Subscribe for new arrivals, exclusive offers and updates.</p><form class="newsletter-form" id="newsletterForm"><label class="sr-only" for="newsletterEmail" data-i="f_email_ph">Your email address</label><input id="newsletterEmail" name="email" type="email" data-ip="f_email_ph" placeholder="Your email address" autocomplete="email" maxlength="120" required><button class="newsletter-submit" type="submit"><span class="sr-only" data-i="f_subscribe">Subscribe</span><span aria-hidden="true">→</span></button></form><p class="newsletter-status" id="newsletterStatus" aria-live="polite"></p></div></div>
@@ -1084,7 +1085,7 @@ footer .footer-brand .footer-channel-link:hover{background:#25d366;color:#052414
 /* ================= CONFIG ================= */
 const SUPABASE_URL='https://lmjiujxxzgctlstfbupg.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_wDrf2l81_YbJRa7YYLIzZA_-yvIuOVw';
-const INSTAGRAM_URL='';   // <-- paste your Instagram page link here, e.g. 'https://www.instagram.com/yourpage/'
+const INSTAGRAM_URL='https://www.instagram.com/drip_house1111?cplk=MWo5aWNyMnFteWU0eQ==';
 const WHATSAPP_URL='https://www.whatsapp.com/channel/0029Vb8ZC8B2ER6pWHyNdV3s';
 const db=window.supabase?.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
