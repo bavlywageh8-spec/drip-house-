@@ -1006,6 +1006,12 @@ body{font-variant-emoji:text}
 .loc-status.ok{color:#65f2d0}.loc-status.bad{color:#ff8f8f}
 .loc-status a{color:#65f2d0;text-decoration:underline}
 </style>
+
+<style id="dh-cutout-style">
+/* product photos that came with a white background get cut out and sit on the same dark glow as the other cards */
+.product-image-frame.dh-cutout{background:radial-gradient(ellipse 80% 70% at 50% 42%,#14584f 0%,#0a2b28 42%,#030b0b 100%)!important}
+.product-image-frame.dh-cutout img{filter:drop-shadow(0 12px 18px #000b)}
+</style>
 </head>
 <body class="noise">
 <div class="bg-fx" aria-hidden="true"><div class="grid"></div><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="mist m1"></i><i class="mist m2"></i></div>
@@ -1242,7 +1248,7 @@ const findLine=(id,v)=>cart.find(c=>lineKey(c.id,c.v)===lineKey(id,v));
 /* ================= PRODUCTS ================= */
 function productCard(p,extraClass=''){
   const img=p.image_url||fallbackProductImage(p),out=Number(p.stock)<=0,dc=Number(p.discount_percent)||0;
-  return `<article class="product ${extraClass} ${out?'soldout':''}" data-product="${safe(p.id)}" tabindex="0" aria-label="${safe(p.name)}"><div class="product-img"><div class="product-image-frame"><span class="tag">${p.is_new?t('newtag'):safe(catLabel(p.category))}</span>${out?`<span class="p-badge sold">${t('sold_out')}</span>`:dc>0?`<span class="p-badge off">-${dc}%</span>`:''}${img?`<img src="${safe(img)}" alt="${safe(p.name)}" loading="lazy" onerror="this.remove()">`:device()}<button type="button" class="product-quick-view" data-quick-view="${safe(p.id)}">${t('quick_view')}</button></div><div class="product-rating" data-product-rating="${safe(p.id)}"></div></div><div class="product-info"><small>${safe(catLabel(p.category))}</small><h3>${safe(p.name)}</h3><div class="product-bottom"><span class="price ${dc>0&&!out?'sale':''}">${dc>0?`<del style="display:block;color:#80918f;font-size:11px">${money(p.price)}</del>`:''}${money(price(p))}</span></div><div class="product-actions"><button type="button" class="product-add-cart" data-add="${safe(p.id)}" ${out?'disabled':''}><span>${t('add_cart')}</span></button></div></div></article>`;
+  return `<article class="product ${extraClass} ${out?'soldout':''}" data-product="${safe(p.id)}" tabindex="0" aria-label="${safe(p.name)}"><div class="product-img"><div class="product-image-frame"><span class="tag">${isNewItem(p)?t('newtag'):safe(catLabel(p.category))}</span>${out?`<span class="p-badge sold">${t('sold_out')}</span>`:dc>0?`<span class="p-badge off">-${dc}%</span>`:''}${img?`<img src="${safe(img)}" alt="${safe(p.name)}" loading="lazy" onerror="this.remove()">`:device()}<button type="button" class="product-quick-view" data-quick-view="${safe(p.id)}">${t('quick_view')}</button></div><div class="product-rating" data-product-rating="${safe(p.id)}"></div></div><div class="product-info"><small>${safe(catLabel(p.category))}</small><h3>${safe(p.name)}</h3><div class="product-bottom"><span class="price ${dc>0&&!out?'sale':''}">${dc>0?`<del style="display:block;color:#80918f;font-size:11px">${money(p.price)}</del>`:''}${money(price(p))}</span></div><div class="product-actions"><button type="button" class="product-add-cart" data-add="${safe(p.id)}" ${out?'disabled':''}><span>${t('add_cart')}</span></button></div></div></article>`;
 }
 function renderProducts(){
   const q=($('#siteSearch')?.value||'').trim().toLowerCase();
@@ -1425,7 +1431,7 @@ async function loadProducts(){
   if(!db){renderProducts();refreshReviewAggregate();return}
   const {data,error}=await db.from('products').select('*').order('id',{ascending:false});
   if(error){console.error(error);$('#products').innerHTML=`<p class="sub">${t('shop_err')}</p>`;return}
-  products=data||[];renderProducts();renderCart();refreshReviewAggregate();
+  products=data||[];await loadBestSellers();renderProducts();renderCart();refreshReviewAggregate();
 }
 
 /* ================= CART ================= */
@@ -1931,12 +1937,21 @@ function rowBlock(id,kick,title,list,cat,moving){
 const shop=cat?`<div class="prow-ctrl"><button type="button" class="prow-all" data-rowall="${cat}">${t('rw_all')} ↗︎</button></div>`:'';
 const arrows=moving?`<button type="button" class="prow-arrow pa-l" data-rowdir="-1" aria-label="${t('rw_prev')}">${ROW_ARROW.l}</button><button type="button" class="prow-arrow pa-r" data-rowdir="1" aria-label="${t('rw_next')}">${ROW_ARROW.r}</button>`:'';
 return `<div class="prow" data-row="${id}"${moving?' data-auto="1"':''}><div class="prow-head"><div>${kick?`<div class="kicker">${kick}</div>`:''}<h2>${title}</h2></div>${shop}</div>${list.length?`<div class="prow-stage">${arrows}<div class="prow-track ${id==='new'||id==='best'?'prow-track-featured':''}">${list.map(rowCard).join('')}</div></div>`:`<p class="prow-empty">${t('rw_none')}</p>`}</div>`}
+/* New arrivals = only products added in the last NEW_DAYS days. Best sellers = products that really sold the most (from order history). */
+const NEW_DAYS=14;let bestSalesIds=[];
+const hasDates=()=>products.some(p=>p.created_at);
+function isNewItem(p){if(hasDates()){const t=+new Date(p.created_at);return !!t&&(Date.now()-t)<=NEW_DAYS*864e5}return !!p.is_new}
+async function loadBestSellers(){
+  bestSalesIds=[];
+  try{if(!db)return;const {data,error}=await db.rpc('best_sellers',{limit_n:6});
+    if(error){console.warn('best_sellers not available yet (run driphouse_best_sellers.sql):',error.message);return}
+    bestSalesIds=(data||[]).filter(r=>Number(r.units)>0).map(r=>String(r.product_id))}catch(e){console.warn(e)}
+}
 function renderRows(){
   const box=$('#prowsBox');if(!box)return;
   const sorted=products.slice();
-  let news=sorted.filter(p=>p.is_new);if(!news.length)news=sorted.slice(0,10);
-  let best=sorted.filter(p=>p.is_best_seller);
-  if(!best.length)best=sorted.filter(p=>Number(p.stock)>0).sort((a,b)=>(Number(b.discount_percent)||0)-(Number(a.discount_percent)||0)).slice(0,10);
+  let news=hasDates()?sorted.filter(isNewItem).sort((a,b)=>+new Date(b.created_at)-+new Date(a.created_at)):sorted.slice(0,6);
+  let best=bestSalesIds.length?bestSalesIds.map(id=>sorted.find(p=>String(p.id)===id)).filter(Boolean):sorted.filter(p=>p.is_best_seller);
   const rows=[];
   if(news.length)rows.push(rowBlock('new',t('rw_new_k'),t('rw_new'),news.slice(0,6)));
   if(best.length)rows.push(rowBlock('best',t('rw_best_k'),t('rw_best'),best.slice(0,6)));
@@ -2129,6 +2144,51 @@ if(matchMedia('(hover:none)').matches){
     e.preventDefault();e.stopPropagation();show(fr);clearTimeout(timer);timer=setTimeout(hide,3000);
   },true);
 }
+})();
+</script>
+
+<script>
+/* ===== white-background product photos -> transparent cutout (matches the dark cards) ===== */
+(function(){
+const MAXD=720,T=236,SAT=16;
+const bgPix=(d,i)=>{const r=d[i],g=d[i+1],b=d[i+2],mn=Math.min(r,g,b),mx=Math.max(r,g,b);return d[i+3]>200&&mn>=T&&mx-mn<=SAT};
+function cutout(img){
+  const src=img.currentSrc||img.src;
+  if(!src||src.startsWith('data:')||src.startsWith('blob:'))return;
+  const im=new Image();im.crossOrigin='anonymous';
+  im.onload=()=>{try{
+    const nw=im.naturalWidth,nh=im.naturalHeight;if(!nw||!nh)return;
+    const sc=Math.min(1,MAXD/Math.max(nw,nh)),w=Math.round(nw*sc),h=Math.round(nh*sc);
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0,w,h);
+    const id=x.getImageData(0,0,w,h),d=id.data;
+    /* is the border white? (dark artwork is left untouched) */
+    let tot=0,wh=0;
+    for(let i=0;i<w;i++){for(const yy of[0,h-1]){tot++;if(bgPix(d,(yy*w+i)*4))wh++}}
+    for(let j=0;j<h;j++){for(const xx of[0,w-1]){tot++;if(bgPix(d,(j*w+xx)*4))wh++}}
+    if(wh/tot<.85)return;
+    /* flood fill the white from the borders inwards, so white inside the product (cap, ice) stays */
+    const rem=new Uint8Array(w*h),st=new Int32Array(w*h);let sp=0;
+    const seed=(px,py)=>{const k=py*w+px;if(!rem[k]&&bgPix(d,k*4)){rem[k]=1;st[sp++]=k}};
+    for(let i=0;i<w;i++){seed(i,0);seed(i,h-1)}for(let j=0;j<h;j++){seed(0,j);seed(w-1,j)}
+    while(sp){const k=st[--sp],px=k%w,py=(k-px)/w;
+      if(px>0)seed(px-1,py);if(px<w-1)seed(px+1,py);if(py>0)seed(px,py-1);if(py<h-1)seed(px,py+1)}
+    for(let k=0;k<w*h;k++){
+      const i=k*4;
+      if(rem[k]){d[i+3]=0;continue}
+      const px=k%w,py=(k-px)/w;
+      const nb=(px>0&&rem[k-1])||(px<w-1&&rem[k+1])||(py>0&&rem[k-w])||(py<h-1&&rem[k+w]);
+      if(nb){const m=Math.min(d[i],d[i+1],d[i+2]);if(m>T-30){d[i+3]=Math.round(255*Math.max(.3,1-(m-(T-30))/(255-(T-30))))}}
+    }
+    x.putImageData(id,0,0);
+    c.toBlob(b=>{if(!b)return;img.src=URL.createObjectURL(b);const fr=img.closest('.product-image-frame');if(fr)fr.classList.add('dh-cutout')},'image/png');
+  }catch(e){console.warn('cutout skipped (image host blocks pixel access):',e.message)}};
+  im.onerror=()=>{};
+  im.src=src;
+}
+function scan(){document.querySelectorAll('.product-image-frame img:not([data-dh]),.detail-visual img:not([data-dh])').forEach(img=>{img.dataset.dh='1';cutout(img)})}
+let tm;new MutationObserver(()=>{clearTimeout(tm);tm=setTimeout(scan,120)}).observe(document.body,{childList:true,subtree:true});
+scan();
 })();
 </script>
 </body>
