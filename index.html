@@ -995,7 +995,8 @@ body{font-variant-emoji:text}
 /* quick view: hidden on touch screens until a finger is on the image */
 @media(hover:none){
   .product-quick-view{transform:translateY(100%)!important;opacity:0!important;visibility:hidden!important;pointer-events:none}
-  .product-quick-view{transition:transform 1.4s cubic-bezier(.25,.6,.3,1) .15s,opacity 1.2s ease .15s,visibility 1.4s .15s!important}
+  .product-quick-view{transition:transform .35s ease,opacity .25s ease,visibility .35s!important}
+  .product-image-frame{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}.product-image-frame img{-webkit-user-drag:none;pointer-events:none}
   .product-image-frame.qv-touch .product-quick-view{transform:translateY(0)!important;opacity:1!important;visibility:visible!important;pointer-events:auto}
 }
 .loc-box{margin-top:14px}
@@ -2110,19 +2111,23 @@ document.addEventListener('click',function(e){
 });
 document.addEventListener('input',e=>{if(e.target.closest&&e.target.closest('#orderForm')&&/^(city|street)$/.test(e.target.name||'')){pinned=null;const st=document.getElementById('locStatus');if(st){st.textContent='';st.className='loc-status'}}});
 
-/* ===== quick view on touch screens: appears only while a finger is on the image ===== */
+/* ===== quick view on touch screens: finger on the image = mouse over the image ===== */
 if(matchMedia('(hover:none)').matches){
   let cur=null,timer=null;
-  const hide=()=>{if(cur){cur.classList.remove('qv-touch');cur=null}clearTimeout(timer)};
+  const show=fr=>{if(cur&&cur!==fr)cur.classList.remove('qv-touch');clearTimeout(timer);fr.classList.add('qv-touch');cur=fr};
+  const hide=()=>{clearTimeout(timer);if(cur){cur.classList.remove('qv-touch');cur=null}};
   document.addEventListener('touchstart',e=>{
     const fr=e.target.closest&&e.target.closest('.product-image-frame');
-    if(!fr){hide();return}
-    if(cur&&cur!==fr)hide();
-    clearTimeout(timer);fr.classList.add('qv-touch');cur=fr;
+    fr?show(fr):hide();
   },{passive:true});
-  document.addEventListener('touchend',()=>{clearTimeout(timer);timer=setTimeout(hide,9000)},{passive:true});
+  document.addEventListener('touchend',()=>{clearTimeout(timer);timer=setTimeout(hide,3000)},{passive:true});
   document.addEventListener('touchcancel',hide,{passive:true});
-  window.addEventListener('scroll',hide,{passive:true});
+  /* a tap on the picture only reveals the bar; the QUICK VIEW button itself opens the product */
+  document.addEventListener('click',e=>{
+    const fr=e.target.closest&&e.target.closest('.product-image-frame');
+    if(!fr||e.target.closest('.product-quick-view,[data-add],[data-fav]'))return;
+    e.preventDefault();e.stopPropagation();show(fr);clearTimeout(timer);timer=setTimeout(hide,3000);
+  },true);
 }
 })();
 </script>
