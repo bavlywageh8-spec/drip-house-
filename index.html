@@ -995,6 +995,7 @@ body{font-variant-emoji:text}
 /* quick view: hidden on touch screens until a finger is on the image */
 @media(hover:none){
   .product-quick-view{transform:translateY(100%)!important;opacity:0!important;visibility:hidden!important;pointer-events:none}
+  .product-quick-view{transition:transform .7s cubic-bezier(.22,.8,.3,1),opacity .6s ease,visibility .7s!important}
   .product-image-frame.qv-touch .product-quick-view{transform:translateY(0)!important;opacity:1!important;visibility:visible!important;pointer-events:auto}
 }
 .loc-box{margin-top:14px}
@@ -2119,7 +2120,7 @@ if(matchMedia('(hover:none)').matches){
     if(cur&&cur!==fr)hide();
     clearTimeout(timer);fr.classList.add('qv-touch');cur=fr;
   },{passive:true});
-  document.addEventListener('touchend',()=>{clearTimeout(timer);timer=setTimeout(hide,2500)},{passive:true});
+  document.addEventListener('touchend',()=>{clearTimeout(timer);timer=setTimeout(hide,6000)},{passive:true});
   document.addEventListener('touchcancel',hide,{passive:true});
   window.addEventListener('scroll',hide,{passive:true});
 }
