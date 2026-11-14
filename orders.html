@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="noindex">
+<title>My orders — DRIPHOUSE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--panel:#0b0f0f;--line:rgba(255,255,255,.08);--mint:#6fe8d5;--mint2:#2cc7b4;--white:#f7f7f7;--muted:#a3a7a6;--red:#ff8a8a;--amber:#ffd37a}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;background:#000;color:var(--white);font-family:"DM Sans",sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+body.ar{font-family:"Cairo","DM Sans",sans-serif}
+a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:10;padding-top:env(safe-area-inset-top);background:rgba(2,3,3,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top-in{width:min(860px,calc(100% - 28px));margin:auto;height:64px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.back{display:inline-flex;align-items:center;gap:8px;padding:10px 16px 10px 12px;border-radius:99px;border:1px solid rgba(111,232,213,.35);color:var(--mint);font-weight:700;font-size:14px;background:rgba(111,232,213,.05)}
+.back svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.back:hover{background:rgba(111,232,213,.13)}
+.brand{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:21px;letter-spacing:-.5px}
+.lang{border:1px solid var(--line);background:transparent;color:var(--muted);padding:8px 13px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.06em}
+main{width:min(860px,calc(100% - 28px));margin:0 auto;padding:30px 0 60px}
+h1{font:700 34px/1.1 "Space Grotesk",sans-serif;margin:6px 0 8px}
+.sub{color:var(--muted);margin:0 0 26px;line-height:1.6}
+.kick{color:var(--mint);font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase}
+
+.card{background:linear-gradient(165deg,#0d1514,#070a0a);border:1px solid rgba(111,232,213,.16);border-radius:24px;padding:20px;margin-bottom:18px}
+.o-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.o-num{font:700 20px "Space Grotesk",sans-serif}
+.o-date{color:var(--muted);font-size:13px;margin-top:3px}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:99px;font-size:12.5px;font-weight:700;border:1px solid rgba(111,232,213,.35);color:var(--mint);background:rgba(111,232,213,.07)}
+.pill:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.warn{color:var(--amber);border-color:rgba(255,211,122,.4);background:rgba(255,211,122,.07)}
+.pill.bad{color:var(--red);border-color:rgba(255,138,138,.4);background:rgba(255,138,138,.07)}
+.eta{display:flex;align-items:center;gap:12px;margin:16px 0 4px;padding:14px 16px;border-radius:18px;background:rgba(111,232,213,.07);border:1px solid rgba(111,232,213,.22)}
+.eta svg{flex:none;width:26px;height:26px;fill:none;stroke:var(--mint);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.eta-line{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.eta-line b{display:inline}.eta-line .eta-date{color:var(--muted);font-size:14px}
+.eta b{display:block;font-size:15px}.eta span{color:var(--muted);font-size:13px}
+.items{margin:8px 0 0;display:grid}
+.item{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.thumb{width:64px;height:64px;border-radius:14px;overflow:hidden;background:#101615;border:1px solid var(--line);display:grid;place-items:center;color:var(--mint)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.i-name{font-weight:600;line-height:1.35}.i-meta{color:var(--muted);font-size:13px;margin-top:3px}
+.i-price{font-weight:700;white-space:nowrap}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin-top:6px;padding-top:16px;border-top:1px solid var(--line)}
+.info div small{display:block;color:var(--muted);font-size:12px;margin-bottom:3px}
+.info div span{font-size:14.5px;line-height:1.5;word-break:break-word}
+.total{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--line);font-size:17px}
+.total b{font:700 22px "Space Grotesk",sans-serif;color:var(--mint)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 22px;border-radius:99px;border:0;font-weight:700;font-size:15px}
+.btn.primary{background:var(--mint);color:#04201a;flex:1 1 200px}
+.btn.primary:hover{background:#8af0e0}
+.btn.ghost{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,.18);flex:1 1 200px}
+.btn.ghost:hover{border-color:var(--mint);color:var(--mint)}
+.btn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn.wa svg{fill:currentColor;stroke:none}
+
+.note{margin-top:26px;padding:22px;border-radius:24px;border:1px solid rgba(111,232,213,.22);background:linear-gradient(165deg,#0c1a18,#070b0b);text-align:center}
+.note p{margin:0 0 6px;line-height:1.7;color:#d6e4e1}
+.note .strong{font-weight:700;color:var(--white)}
+.note .btn{margin-top:14px;background:#25d366;color:#05260f;width:min(360px,100%)}
+.note .btn:hover{background:#3fe07d}
+
+.empty{text-align:center;padding:50px 20px}
+.empty svg{width:56px;height:56px;fill:none;stroke:var(--mint);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin-bottom:14px}
+.empty h2{font:700 24px "Space Grotesk",sans-serif;margin:0 0 8px}
+.empty p{color:var(--muted);margin:0 0 20px;line-height:1.6}
+.empty .btn{width:min(320px,100%);background:var(--mint);color:#04201a}
+.sk{height:210px;border-radius:24px;border:1px solid var(--line);background:linear-gradient(100deg,#0b0f0f 30%,#121a19 50%,#0b0f0f 70%);background-size:300% 100%;animation:sk 1.3s linear infinite;margin-bottom:18px}
+@keyframes sk{to{background-position:-100% 0}}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,30px);opacity:0;pointer-events:none;background:#0e1b19;border:1px solid rgba(111,232,213,.4);color:var(--white);padding:13px 20px;border-radius:99px;font-size:14px;transition:.3s;z-index:50;max-width:calc(100% - 32px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+.card.old{padding:0;overflow:hidden}
+.old-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;background:none;border:0;color:inherit;text-align:left}
+.old-head .l{display:grid;gap:3px}.old-head .r{display:flex;align-items:center;gap:12px}
+.old-head .tt{font-weight:700;color:var(--mint)}
+.arrow{width:30px;height:30px;border-radius:50%;border:1px solid rgba(111,232,213,.35);display:grid;place-items:center;color:var(--mint);transition:transform .25s;flex:none}
+.arrow svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.card.old.open .arrow{transform:rotate(180deg)}
+.o-body{display:none;padding:0 20px 20px;border-top:1px solid var(--line)}
+.card.old.open .o-body{display:block}
+.old-title{margin:26px 0 12px;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+.sums{margin-top:14px;display:grid;gap:7px;color:var(--muted);font-size:14px}
+.sums div{display:flex;justify-content:space-between}.sums .disc{color:var(--mint)}
+.maplink{color:var(--mint);text-decoration:underline;font-size:13px;display:inline-block;margin-top:4px}
+.cal{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.cal .d{width:62px;border-radius:12px;overflow:hidden;border:1px solid rgba(111,232,213,.35);background:#050808;text-align:center}
+.cal .d i{display:block;font-style:normal;background:var(--mint);color:#04201a;font-size:10px;font-weight:800;letter-spacing:.1em;padding:3px 0}
+.cal .d b{display:block;font:700 24px/1.2 "Space Grotesk",sans-serif;padding:3px 0 0}
+.cal .d small{display:block;color:var(--muted);font-size:10px;padding-bottom:5px}
+.cal .to{color:var(--mint);font-size:20px}
+.again-box{display:none;margin-top:14px;padding:16px;border-radius:18px;border:1px solid rgba(111,232,213,.22);background:rgba(111,232,213,.05)}
+.again-box.on{display:block}
+.again-box p{margin:0 0 6px;font-weight:700}.again-box small{display:block;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.again-box .row{display:flex;flex-wrap:wrap;gap:10px}.again-box .btn{padding:12px 16px;font-size:14px;flex:1 1 180px}
+.ship-prev{color:var(--muted);font-size:13px;margin-bottom:12px;line-height:1.5}
+.legal{margin-top:30px;padding:20px 0 6px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:13px}
+.legal button{background:none;border:0;color:var(--mint);text-decoration:underline;padding:0 4px;font-size:13px}
+.mdl{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:60;display:none;place-items:center;padding:20px}.mdl.on{display:grid}
+.mdl-card{width:min(520px,100%);max-height:85vh;overflow:auto;background:#0b0f0f;border:1px solid rgba(111,232,213,.25);border-radius:24px;padding:26px;position:relative}
+.mdl-card h3{font:700 22px "Space Grotesk",sans-serif;margin:0 0 8px}.mdl-card p{color:var(--muted);line-height:1.6}
+.mdl-card ul{padding-left:20px;line-height:1.7;color:#d6e4e1}
+.mdl-x{position:absolute;top:12px;right:14px;background:none;border:0;color:var(--white);font-size:26px;line-height:1}
+@media(max-width:560px){h1{font-size:28px}.card{padding:16px;border-radius:20px}.info{grid-template-columns:1fr}.item{grid-template-columns:56px 1fr;}.thumb{width:56px;height:56px}.i-price{grid-column:2}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="back" href="index.html" id="backLink"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span data-i="back">Back to shop</span></a>
+  <a class="brand" href="index.html">DRIPHOUSE</a>
+  <button class="lang" id="langBtn" type="button">AR / EN</button>
+</div></header>
+
+<main>
+  <div class="kick" data-i="kick">YOUR ACCOUNT</div>
+  <h1 data-i="title">My orders</h1>
+  <p class="sub" data-i="sub">See what you bought, check delivery dates and order your favourites again.</p>
+  <div id="list"><div class="sk"></div><div class="sk"></div></div>
+
+  <section class="note" id="note" hidden>
+    <p class="strong" data-i="note1">Delivery takes from 3 to 5 days.</p>
+    <p data-i="note2">For cancelling your order or more details, send us a message on WhatsApp.</p>
+    <a class="btn" id="waMain" href="https://wa.me/201555687219" data-wa="">
+      <svg viewBox="0 0 24 24" style="fill:currentColor;stroke:none" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.95L2 22l5.2-1.5A9.9 9.9 0 1 0 12.04 2zm5.8 14.1c-.25.7-1.4 1.3-1.95 1.35-.5.05-1.1.07-1.8-.12a14 14 0 0 1-5.5-3.6 8.6 8.6 0 0 1-1.8-3.2c-.2-1 .6-1.7.9-2 .25-.25.6-.3.8-.3h.55c.17 0 .4-.07.6.45l.85 2c.07.15.1.3 0 .5l-.4.6c-.13.17-.28.35-.12.62a7.3 7.3 0 0 0 3.3 2.9c.3.14.5.12.7-.07.18-.2.8-.9 1-1.2.2-.3.4-.25.65-.15l1.9.9c.27.12.45.2.5.32.1.15.1.7-.15 1.3z"/></svg>
+      <span data-i="wa_btn">Message us on WhatsApp</span></a>
+  </section>
+  <div class="legal"><button type="button" data-legal="terms" data-i="terms_link">Terms and conditions</button>·<button type="button" data-legal="privacy" data-i="privacy_link">Privacy policy</button></div>
+</main>
+<div class="mdl" id="mdl"><div class="mdl-card"><button class="mdl-x" id="mdlX" type="button" aria-label="Close">×</button><h3 id="mdlT"></h3><p id="mdlP"></p><ul id="mdlL"></ul></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://lmjiujxxzgctlstfbupg.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_wDrf2l81_YbJRa7YYLIzZA_-yvIuOVw';
+const WA='201555687219';
+const db=window.supabase?.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- language (same switch as the shop; layout never flips) ---------- */
+let lang=localStorage.getItem('dh_lang')==='ar'?'ar':'en';
+const I={
+ back:['Back to shop','العودة للمتجر'],kick:['YOUR ACCOUNT','حسابك'],title:['My orders','طلباتي'],
+ sub:['See what you bought, check delivery dates and order your favourites again.','شاهد ما اشتريته وتواريخ التوصيل واطلب منتجاتك المفضلة مرة أخرى.'],
+ note1:['Delivery takes from 3 to 5 days.','يستغرق التوصيل من 3 إلى 5 أيام.'],
+ note2:['For cancelling your order or more details, send us a message on WhatsApp.','لإلغاء الطلب أو لمزيد من التفاصيل، أرسل لنا رسالة على واتساب.'],
+ wa_btn:['Message us on WhatsApp','راسلنا على واتساب'],
+ order:['Order','طلب'],placed:['Placed on','تم الطلب في'],expected:['Expected delivery','موعد التوصيل المتوقع'],
+ takes:['Delivery takes 3 to 5 days','التوصيل يستغرق من 3 إلى 5 أيام'],delivered:['Delivered','تم التوصيل'],cancelled:['This order was cancelled','تم إلغاء هذا الطلب'],
+ qty:['Qty','الكمية'],address:['Delivery address','عنوان التوصيل'],phone:['Phone','الهاتف'],payment:['Payment','الدفع'],cod:['Cash on delivery','الدفع عند الاستلام'],
+ name:['Name','الاسم'],total:['Total','الإجمالي'],again:['Order again','اطلب مرة أخرى'],ask:['Cancel or ask about this order','إلغاء أو استفسار عن هذا الطلب'],
+ empty_t:['No orders yet','لا توجد طلبات بعد'],empty_p:['When you place an order it will show up here.','عند إتمام طلب سيظهر هنا.'],shop:['Start shopping','ابدأ التسوق'],
+ login_t:['Log in to see your orders','سجّل الدخول لرؤية طلباتك'],login_p:['Your orders are saved to your account. Log in from the shop and come back here.','طلباتك محفوظة في حسابك. سجّل الدخول من المتجر ثم ارجع إلى هنا.'],login_b:['Go to the shop and log in','اذهب للمتجر وسجّل الدخول'],
+ err_t:['We could not load your orders','تعذّر تحميل طلباتك'],err_p:['Please check your connection and try again.','تحقق من اتصالك وحاول مرة أخرى.'],retry:['Try again','حاول مرة أخرى'],
+ st_pending:['Order received','تم استلام الطلب'],st_confirmed:['Confirmed','تم التأكيد'],st_processing:['Preparing','قيد التجهيز'],st_shipped:['On the way','في الطريق'],st_delivered:['Delivered','تم التوصيل'],st_cancelled:['Cancelled','ملغي'],
+ added:['Added to your cart','تمت الإضافة إلى سلتك'],unavail:['unavailable now','غير متوفر حاليا'],none:['Sorry, these items are out of stock right now.','عذرا، هذه المنتجات غير متوفرة حاليا.'],
+ cur:['L.E','ج.م'],terms_link:['Terms and conditions','الشروط والأحكام'],privacy_link:['Privacy policy','سياسة الخصوصية'],
+terms_intro:['Please use the store responsibly and review product details before ordering.','يرجى استخدام المتجر بمسؤولية ومراجعة تفاصيل المنتج قبل الطلب.'],
+terms_1:['This store and its age-restricted products are intended only for adults aged 18 or older.','هذا المتجر ومنتجاته المقيدة بالعمر مخصصة للبالغين من عمر 18 عاماً فأكثر فقط.'],terms_2:['Orders are subject to availability, delivery confirmation and the payment method selected at checkout.','تخضع الطلبات للتوفر وتأكيد التوصيل وطريقة الدفع التي تختارها عند إتمام الطلب.'],terms_3:['Reviews must be based on your genuine experience, respectful, and may be moderated before publication.','يجب أن تستند المراجعات إلى تجربتك الحقيقية وأن تكون محترمة وقد تتم مراجعتها قبل النشر.'],
+privacy_intro:['We use the details you provide to manage accounts, orders, support and reviews.','نستخدم البيانات التي تقدمها لإدارة الحسابات والطلبات والدعم والمراجعات.'],
+privacy_1:['Account, delivery and contact details are used to process and support your orders.','تُستخدم بيانات الحساب والتوصيل والتواصل لمعالجة طلباتك ودعمها.'],privacy_2:['Reviews are stored for moderation. Approved reviews, including the display name you choose (or Anonymous), may appear on the store.','تُحفظ المراجعات لمراجعتها. وقد تظهر المراجعات الموافقة عليها مع الاسم الذي تختاره أو باسم مجهول على المتجر.'],privacy_3:['For questions or requests about your personal information, contact the store.','للاستفسارات أو الطلبات المتعلقة ببياناتك الشخصية، تواصل مع المتجر.'],
+email:['Email','البريد'],subtotal:['Subtotal','الإجمالي الفرعي'],delivery:['Delivery','التوصيل'],discount:['Discount','الخصم'],free:['Free','مجاني'],gov:['Governorate','المحافظة'],city:['City','المدينة'],map:['Open in Google Maps','افتح في خرائط جوجل'],
+older:['Previous orders','الطلبات السابقة'],latest:['Latest order','آخر طلب'],
+ag_q:['Where should we deliver it?','أين نوصّل الطلب؟'],ag_s:['Use the same shipping details','نفس بيانات الشحن'],ag_d:['Use different shipping details','بيانات شحن مختلفة'],ag_note:['Items are added to your cart, then you continue to checkout.','تتم إضافة المنتجات إلى سلتك ثم تتابع إلى الدفع.'],
+arrives:['Arrives','يصل'],hello:['Hello Driphouse, I would like to ask about my order','مرحبا درب هاوس، أريد الاستفسار عن طلبي'],hello2:['Hello Driphouse, I need help with my order.','مرحبا درب هاوس، أحتاج مساعدة بخصوص طلبي.']
+};
+const t=k=>(I[k]||[k,k])[lang==='ar'?1:0];
+const nf=n=>Number(n||0).toLocaleString('en-US',{maximumFractionDigits:2});
+const money=n=>lang==='ar'?nf(n)+' '+t('cur'):t('cur')+' '+nf(n);
+const fmt=(d,opt)=>new Intl.DateTimeFormat(lang==='ar'?'ar-EG':'en-GB',opt).format(d);
+const dShort=d=>fmt(d,{day:'numeric',month:'short'});
+const dLong=d=>fmt(d,{day:'numeric',month:'short',year:'numeric'});
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+function applyStatic(){
+  document.documentElement.lang=lang;document.body.classList.toggle('ar',lang==='ar');
+  document.querySelectorAll('[data-i]').forEach(el=>el.textContent=t(el.dataset.i));
+  $('#langBtn').textContent=lang==='ar'?'EN / AR':'AR / EN';
+}
+$('#langBtn').onclick=()=>{lang=lang==='ar'?'en':'ar';localStorage.setItem('dh_lang',lang);applyStatic();render()};
+
+/* ---------- WhatsApp: open the app straight away, web only as a fallback ---------- */
+function openWA(msg){
+  const q=encodeURIComponent(msg||t('hello2'));
+  const app='whatsapp://send?phone='+WA+'&text='+q,web='https://wa.me/'+WA+'?text='+q;
+  let left=false;const mark=()=>{left=true};
+  document.addEventListener('visibilitychange',mark,{once:true});addEventListener('pagehide',mark,{once:true});
+  location.href=app;
+  setTimeout(()=>{document.removeEventListener('visibilitychange',mark);if(!left&&!document.hidden)location.href=web},1600);
+}
+document.addEventListener('click',e=>{const a=e.target.closest('[data-wa]');if(!a)return;e.preventDefault();openWA(a.dataset.wa||t('hello2'))});
+
+function toast(m){const el=$('#toast');el.textContent=m;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),2600)}
+
+/* ---------- data ---------- */
+let ORDERS=[],PRODUCTS={},state='loading';
+const variantsOf=p=>{let v=p&&p.variants;if(typeof v==='string'){try{v=JSON.parse(v)}catch{v=[]}}return Array.isArray(v)?v.filter(x=>x&&x.name):[]};
+async function load(){
+  state='loading';render();
+  try{
+    if(!db)throw new Error('Supabase unavailable');
+    const {data:{session}}=await db.auth.getSession();
+    const user=session&&session.user;
+    if(!user||user.is_anonymous||!user.email){state='login';render();return}
+    const {data:orders,error}=await db.from('orders').select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(60);
+    if(error)throw error;
+    ORDERS=orders||[];
+    if(ORDERS.length){
+      const ids=ORDERS.map(o=>o.id);
+      const [it,pr]=await Promise.all([db.from('order_items').select('*').in('order_id',ids),db.from('products').select('*')]);
+      if(it.error)throw it.error;
+      const by={};(it.data||[]).forEach(r=>(by[r.order_id]=by[r.order_id]||[]).push(r));
+      ORDERS.forEach(o=>o.items=by[o.id]||[]);
+      PRODUCTS={};(pr.data||[]).forEach(p=>PRODUCTS[String(p.id)]=p);
+    }
+    state=ORDERS.length?'list':'empty';render();
+  }catch(err){console.error('Could not load orders:',err);state='error';render()}
+}
+
+/* ---------- render ---------- */
+const ICON={
+ truck:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.500h11v9H3zM14 9.500h3.500l3 3v3H14"/><circle cx="7.500" cy="17.500" r="1.800"/><circle cx="17" cy="17.500" r="1.800"/></svg>',
+ bag:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.500h12v17l-3-2-3 2-3-2-3 2z"/><path d="M9 8.500h6M9 12h6"/></svg>',
+ repeat:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11a8 8 0 0 1 13.700-5.600L20 8M20 4v4h-4M20 13a8 8 0 0 1-13.700 5.600L4 16M4 20v-4h4"/></svg>',
+ wa:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.95L2 22l5.2-1.5A9.9 9.9 0 1 0 12.04 2zm5.8 14.1c-.25.7-1.4 1.3-1.95 1.35-.5.05-1.1.07-1.8-.12a14 14 0 0 1-5.5-3.6 8.6 8.6 0 0 1-1.8-3.2c-.2-1 .6-1.7.9-2 .25-.25.6-.3.8-.3h.55c.17 0 .4-.07.6.45l.85 2c.07.15.1.3 0 .5l-.4.6c-.13.17-.28.35-.12.62a7.3 7.3 0 0 0 3.3 2.9c.3.14.5.12.7-.07.18-.2.8-.9 1-1.2.2-.3.4-.25.65-.15l1.9.9c.27.12.45.2.5.32.1.15.1.7-.15 1.3z"/></svg>'
+};
+const statusOf=o=>String(o.status||'pending').toLowerCase();
+function statusPill(o){
+  const s=statusOf(o),map={pending:'warn',confirmed:'',processing:'',shipped:'',delivered:'',cancelled:'bad',canceled:'bad'};
+  const key='st_'+(s==='canceled'?'cancelled':s);
+  const label=I[key]?t(key):s.charAt(0).toUpperCase()+s.slice(1);
+  return `<span class="pill ${map[s]??''}">${esc(label)}</span>`;
+}
+function orderNo(o){const id=String(o.id);return '#'+(id.length>10?id.replace(/-/g,'').slice(0,8).toUpperCase():id)}
+function calTile(d){return `<div class="d"><i>${esc(fmt(d,{month:'short'}).toUpperCase())}</i><b>${d.getDate()}</b><small>${esc(fmt(d,{weekday:'short'}))}</small></div>`}
+function calRange(made){return `<div class="cal">${calTile(addDays(made,3))}<span class="to">→</span>${calTile(addDays(made,5))}</div>`}
+function etaBlock(o){
+  const s=statusOf(o),made=new Date(o.created_at||Date.now());
+  if(s==='cancelled'||s==='canceled')return `<div class="eta" style="border-color:rgba(255,138,138,.3);background:rgba(255,138,138,.06)">${ICON.truck.replace('var(--mint)','')}<div><b>${t('cancelled')}</b></div></div>`;
+  if(s==='delivered')return `<div class="eta">${ICON.truck}<div class="eta-line"><b>${t('delivered')}</b><span class="eta-date">${dShort(addDays(made,3))} – ${dShort(addDays(made,5))}</span></div></div>`;
+  return `<div class="eta">${ICON.truck}<div><b>${t('expected')}: ${dShort(addDays(made,3))} – ${dShort(addDays(made,5))}</b><span>${t('takes')}</span></div></div>`;
+}
+function itemRow(it){
+  const p=PRODUCTS[String(it.product_id)],img=p&&p.image_url;
+  const line=Number(it.price||0)*Number(it.qty||1);
+  return `<div class="item"><div class="thumb">${img?`<img src="${esc(img)}" alt="" loading="lazy">`:'✳'}</div><div><div class="i-name">${esc(it.name||p?.name||'')}</div><div class="i-meta">${t('qty')}: ${Number(it.qty||1)} · ${money(it.price)}</div></div><div class="i-price">${money(line)}</div></div>`;
+}
+function splitAddr(o){
+  const raw=String(o.address||''),i=raw.indexOf(' | Google Maps:');
+  return {addr:(i<0?raw:raw.slice(0,i)).trim(),map:i<0?'':raw.slice(i+15).trim()};
+}
+const ARROW='<span class="arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>';
+function body(o){
+  const made=new Date(o.created_at||Date.now());
+  const {addr,map}=splitAddr(o);
+  const pay=!o.payment_method||o.payment_method==='cash'?t('cod'):o.payment_method;
+  const items=o.items||[];
+  const sub=items.reduce((a,it)=>a+Number(it.price||0)*Number(it.qty||1),0);
+  const disc=Number(o.discount_amount||o.discount||0);
+  const del=Math.max(0,Number(o.total||0)-sub+disc);
+  const sums=items.length?`<div class="sums"><div><span>${t('subtotal')}</span><span>${money(sub)}</span></div>${disc>0?`<div class="disc"><span>${t('discount')}${o.promo_code?' ('+esc(o.promo_code)+')':''}</span><span>− ${money(disc)}</span></div>`:''}<div><span>${t('delivery')}</span><span>${del>0?money(del):t('free')}</span></div></div>`:'';
+  return `${etaBlock(o)}
+   <div class="items">${items.map(itemRow).join('')}</div>${sums}
+   <div class="total"><span>${t('total')}</span><b>${money(o.total)}</b></div>
+   <div class="info">
+     ${o.customer_name?`<div><small>${t('name')}</small><span>${esc(o.customer_name)}</span></div>`:''}
+     <div><small>${t('phone')}</small><span dir="ltr">${esc(o.phone||'')}</span></div>
+     ${o.customer_email?`<div><small>${t('email')}</small><span dir="ltr">${esc(o.customer_email)}</span></div>`:''}
+     <div><small>${t('payment')}</small><span>${esc(pay)}</span></div>
+     ${o.governorate?`<div><small>${t('gov')}</small><span>${esc(o.governorate)}</span></div>`:''}
+     ${o.city?`<div><small>${t('city')}</small><span>${esc(o.city)}</span></div>`:''}
+     <div style="grid-column:1/-1"><small>${t('address')}</small><span>${esc(addr)}</span></div>
+   </div>
+   <div class="actions">
+     <button class="btn primary" type="button" data-again-toggle="${esc(o.id)}">${ICON.repeat}<span>${t('again')}</span></button>
+     <a class="btn ghost wa" href="https://wa.me/${WA}" data-wa="${esc(t('hello')+' '+orderNo(o)+' ('+dLong(made)+').')}">${ICON.wa}<span>${t('ask')}</span></a>
+   </div>
+   <div class="again-box" id="ab-${esc(o.id)}"><p>${t('ag_q')}</p><div class="ship-prev">${esc([o.customer_name,o.phone,addr].filter(Boolean).join(' · '))}</div><small>${t('ag_note')}</small>
+     <div class="row"><button class="btn primary" type="button" data-again="${esc(o.id)}" data-ship="same">${t('ag_s')}</button><button class="btn ghost" type="button" data-again="${esc(o.id)}" data-ship="new">${t('ag_d')}</button></div></div>`;
+}
+function orderCard(o,isOld){
+  const made=new Date(o.created_at||Date.now());
+  if(!isOld)return `<article class="card" data-order="${esc(o.id)}">
+   <div class="o-head"><div><div class="o-num">${t('order')} ${esc(orderNo(o))}</div><div class="o-date">${t('placed')} ${dLong(made)}</div></div>${statusPill(o)}</div>${body(o)}</article>`;
+  return `<article class="card old" data-order="${esc(o.id)}">
+   <button class="old-head" type="button" data-toggle="${esc(o.id)}" aria-expanded="false"><div class="l"><div class="o-num">${t('order')} ${esc(orderNo(o))}</div><div class="o-date">${dLong(made)}</div></div><div class="r">${statusPill(o)}<span class="tt">${money(o.total)}</span>${ARROW}</div></button>
+   <div class="o-body">${body(o)}</div></article>`;
+}
+function render(){
+  const box=$('#list');applyStatic();
+  $('#note').hidden=state!=='list'&&state!=='empty';
+  if(state==='loading'){box.innerHTML='<div class="sk"></div><div class="sk"></div>';return}
+  if(state==='login'){box.innerHTML=`<div class="card empty">${ICON.bag}<h2>${t('login_t')}</h2><p>${t('login_p')}</p><a class="btn" href="index.html">${t('login_b')}</a></div>`;return}
+  if(state==='error'){box.innerHTML=`<div class="card empty">${ICON.bag}<h2>${t('err_t')}</h2><p>${t('err_p')}</p><button class="btn" id="retry" type="button">${t('retry')}</button></div>`;$('#retry').onclick=load;return}
+  if(state==='empty'){box.innerHTML=`<div class="card empty">${ICON.bag}<h2>${t('empty_t')}</h2><p>${t('empty_p')}</p><a class="btn" href="index.html">${t('shop')}</a></div>`;return}
+  const openIds=new Set([...document.querySelectorAll('.card.old.open')].map(x=>x.dataset.order));
+  box.innerHTML=orderCard(ORDERS[0],false)+(ORDERS.length>1?`<div class="old-title">${t('older')} (${ORDERS.length-1})</div>`+ORDERS.slice(1).map(o=>orderCard(o,true)).join(''):'');
+  openIds.forEach(id=>{const c=box.querySelector(`.card.old[data-order="${CSS.escape(id)}"]`);if(c)c.classList.add('open')});
+}
+
+/* ---------- collapse / expand older orders, order-again choice, legal modal ---------- */
+document.addEventListener('click',e=>{
+  const tg=e.target.closest('[data-toggle]');
+  if(tg){const c=tg.closest('.card');const on=c.classList.toggle('open');tg.setAttribute('aria-expanded',on);return}
+  const ab=e.target.closest('[data-again-toggle]');
+  if(ab){const bx=document.getElementById('ab-'+ab.dataset.againToggle);if(bx)bx.classList.toggle('on');return}
+  const lg=e.target.closest('[data-legal]');
+  if(lg){const k=lg.dataset.legal;$('#mdlT').textContent=t(k+'_link');$('#mdlP').textContent=t(k+'_intro');$('#mdlL').innerHTML=[1,2,3].map(i=>`<li>${esc(t(k+'_'+i))}</li>`).join('');$('#mdl').classList.add('on');return}
+  if(e.target.id==='mdl'||e.target.id==='mdlX')$('#mdl').classList.remove('on');
+});
+
+/* order again: same items go to the cart; shipping is either reused or left blank */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-again]');if(!b)return;
+  const o=ORDERS.find(x=>String(x.id)===b.dataset.again);if(!o)return;
+  let cart=[];try{cart=JSON.parse(localStorage.getItem('driphouse_cart')||'[]')}catch{}
+  let added=0,skipped=0;
+  for(const it of o.items||[]){
+    const p=PRODUCTS[String(it.product_id)];
+    if(!p||Number(p.stock)<=0){skipped++;continue}
+    const id=String(it.product_id),nm=String(it.name||'');let v='';
+    for(const vr of variantsOf(p)){if(nm.endsWith(' — '+vr.name)){v=vr.name;break}}
+    const qty=Math.max(1,Math.min(Number(it.qty)||1,Number(p.stock)));
+    const line=cart.find(c=>String(c.id)===id&&(c.v||'')===v);
+    if(line)line.qty=Math.min(line.qty+qty,Number(p.stock));else{const r={id,qty};if(v)r.v=v;cart.push(r)}
+    added++;
+  }
+  if(!added){toast(t('none'));return}
+  try{
+    if(b.dataset.ship==='same'){
+      const {addr}=splitAddr(o),parts=addr.split(', ');
+      const gov=o.governorate||parts[0]||'',city=o.city||parts[1]||'';
+      const street=(o.governorate&&o.city&&parts[0]===gov&&parts[1]===city?parts.slice(2):parts).join(', ');
+      sessionStorage.setItem('dh_ship',JSON.stringify({name:o.customer_name||'',phone:o.phone||'',governorate:gov,city:city,street:street}));
+    }else sessionStorage.removeItem('dh_ship');
+  }catch{}
+  localStorage.setItem('driphouse_cart',JSON.stringify(cart));
+  sessionStorage.setItem('dh_open_cart','1');
+  toast(t('added')+(skipped?` · ${skipped} ${t('unavail')}`:''));
+  setTimeout(()=>{location.href='index.html'},skipped?1300:500);
+});
+
+applyStatic();load();
+</script>
+</body>
+</html>
