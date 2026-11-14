@@ -38,6 +38,7 @@ h1{font:700 34px/1.1 "Space Grotesk",sans-serif;margin:6px 0 8px}
 .pill.bad{color:var(--red);border-color:rgba(255,138,138,.4);background:rgba(255,138,138,.07)}
 .eta{display:flex;align-items:center;gap:12px;margin:16px 0 4px;padding:14px 16px;border-radius:18px;background:rgba(111,232,213,.07);border:1px solid rgba(111,232,213,.22)}
 .eta svg{flex:none;width:26px;height:26px;fill:none;stroke:var(--mint);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.eta-line{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.eta-line b{display:inline}.eta-line .eta-date{color:var(--muted);font-size:14px}
 .eta b{display:block;font-size:15px}.eta span{color:var(--muted);font-size:13px}
 .items{margin:8px 0 0;display:grid}
 .item{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
@@ -243,8 +244,8 @@ function calRange(made){return `<div class="cal">${calTile(addDays(made,3))}<spa
 function etaBlock(o){
   const s=statusOf(o),made=new Date(o.created_at||Date.now());
   if(s==='cancelled'||s==='canceled')return `<div class="eta" style="border-color:rgba(255,138,138,.3);background:rgba(255,138,138,.06)">${ICON.truck.replace('var(--mint)','')}<div><b>${t('cancelled')}</b></div></div>`;
-  if(s==='delivered')return `<div class="eta">${ICON.truck}<div><b>${t('delivered')}</b>${calRange(made)}</div></div>`;
-  return `<div class="eta">${ICON.truck}<div><b>${t('expected')}: ${dShort(addDays(made,3))} – ${dShort(addDays(made,5))}</b><span>${t('takes')}</span>${calRange(made)}</div></div>`;
+  if(s==='delivered')return `<div class="eta">${ICON.truck}<div class="eta-line"><b>${t('delivered')}</b><span class="eta-date">${dShort(addDays(made,3))} – ${dShort(addDays(made,5))}</span></div></div>`;
+  return `<div class="eta">${ICON.truck}<div><b>${t('expected')}: ${dShort(addDays(made,3))} – ${dShort(addDays(made,5))}</b><span>${t('takes')}</span></div></div>`;
 }
 function itemRow(it){
   const p=PRODUCTS[String(it.product_id)],img=p&&p.image_url;
