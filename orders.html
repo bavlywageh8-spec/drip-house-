@@ -38,7 +38,6 @@ h1{font:700 34px/1.1 "Space Grotesk",sans-serif;margin:6px 0 8px}
 .pill.bad{color:var(--red);border-color:rgba(255,138,138,.4);background:rgba(255,138,138,.07)}
 .eta{display:flex;align-items:center;gap:12px;margin:16px 0 4px;padding:14px 16px;border-radius:18px;background:rgba(111,232,213,.07);border:1px solid rgba(111,232,213,.22)}
 .eta svg{flex:none;width:26px;height:26px;fill:none;stroke:var(--mint);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.eta-line{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.eta-line b{display:inline}.eta-line .eta-date{color:var(--muted);font-size:14px}
 .eta b{display:block;font-size:15px}.eta span{color:var(--muted);font-size:13px}
 .items{margin:8px 0 0;display:grid}
 .item{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
@@ -88,7 +87,7 @@ h1{font:700 34px/1.1 "Space Grotesk",sans-serif;margin:6px 0 8px}
 .card.old.open .o-body{display:block}
 .old-title{margin:26px 0 12px;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
 .sums{margin-top:14px;display:grid;gap:7px;color:var(--muted);font-size:14px}
-.sums div{display:flex;justify-content:space-between}.sums .disc{color:var(--mint)}
+.sums div{display:flex;justify-content:space-between}.sums .disc{color:var(--mint)}.sums-h{margin:0 0 4px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--text,#fff)}
 .maplink{color:var(--mint);text-decoration:underline;font-size:13px;display:inline-block;margin-top:4px}
 .cal{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
 .cal .d{width:62px;border-radius:12px;overflow:hidden;border:1px solid rgba(111,232,213,.35);background:#050808;text-align:center}
@@ -167,7 +166,7 @@ terms_intro:['Please use the store responsibly and review product details before
 terms_1:['This store and its age-restricted products are intended only for adults aged 18 or older.','هذا المتجر ومنتجاته المقيدة بالعمر مخصصة للبالغين من عمر 18 عاماً فأكثر فقط.'],terms_2:['Orders are subject to availability, delivery confirmation and the payment method selected at checkout.','تخضع الطلبات للتوفر وتأكيد التوصيل وطريقة الدفع التي تختارها عند إتمام الطلب.'],terms_3:['Reviews must be based on your genuine experience, respectful, and may be moderated before publication.','يجب أن تستند المراجعات إلى تجربتك الحقيقية وأن تكون محترمة وقد تتم مراجعتها قبل النشر.'],
 privacy_intro:['We use the details you provide to manage accounts, orders, support and reviews.','نستخدم البيانات التي تقدمها لإدارة الحسابات والطلبات والدعم والمراجعات.'],
 privacy_1:['Account, delivery and contact details are used to process and support your orders.','تُستخدم بيانات الحساب والتوصيل والتواصل لمعالجة طلباتك ودعمها.'],privacy_2:['Reviews are stored for moderation. Approved reviews, including the display name you choose (or Anonymous), may appear on the store.','تُحفظ المراجعات لمراجعتها. وقد تظهر المراجعات الموافقة عليها مع الاسم الذي تختاره أو باسم مجهول على المتجر.'],privacy_3:['For questions or requests about your personal information, contact the store.','للاستفسارات أو الطلبات المتعلقة ببياناتك الشخصية، تواصل مع المتجر.'],
-email:['Email','البريد'],subtotal:['Subtotal','الإجمالي الفرعي'],delivery:['Delivery','التوصيل'],discount:['Discount','الخصم'],free:['Free','مجاني'],gov:['Governorate','المحافظة'],city:['City','المدينة'],map:['Open in Google Maps','افتح في خرائط جوجل'],
+email:['Email','البريد'],subtotal:['Subtotal','الإجمالي الفرعي'],delivery:['Delivery','التوصيل'],discount:['Discount','الخصم'],free:['Free','مجاني'],paysum:['Payment summary','ملخص الدفع'],itemsCost:['Items cost','سعر المنتجات'],delFee:['Delivery fee','رسوم التوصيل'],gov:['Governorate','المحافظة'],city:['City','المدينة'],map:['Open in Google Maps','افتح في خرائط جوجل'],
 older:['Previous orders','الطلبات السابقة'],latest:['Latest order','آخر طلب'],
 ag_q:['Where should we deliver it?','أين نوصّل الطلب؟'],ag_s:['Use the same shipping details','نفس بيانات الشحن'],ag_d:['Use different shipping details','بيانات شحن مختلفة'],ag_note:['Items are added to your cart, then you continue to checkout.','تتم إضافة المنتجات إلى سلتك ثم تتابع إلى الدفع.'],
 arrives:['Arrives','يصل'],hello:['Hello Driphouse, I would like to ask about my order','مرحبا درب هاوس، أريد الاستفسار عن طلبي'],hello2:['Hello Driphouse, I need help with my order.','مرحبا درب هاوس، أحتاج مساعدة بخصوص طلبي.']
@@ -244,8 +243,8 @@ function calRange(made){return `<div class="cal">${calTile(addDays(made,3))}<spa
 function etaBlock(o){
   const s=statusOf(o),made=new Date(o.created_at||Date.now());
   if(s==='cancelled'||s==='canceled')return `<div class="eta" style="border-color:rgba(255,138,138,.3);background:rgba(255,138,138,.06)">${ICON.truck.replace('var(--mint)','')}<div><b>${t('cancelled')}</b></div></div>`;
-  if(s==='delivered')return `<div class="eta">${ICON.truck}<div class="eta-line"><b>${t('delivered')}</b><span class="eta-date">${dShort(addDays(made,3))} – ${dShort(addDays(made,5))}</span></div></div>`;
-  return `<div class="eta">${ICON.truck}<div><b>${t('expected')}: ${dShort(addDays(made,3))} – ${dShort(addDays(made,5))}</b><span>${t('takes')}</span></div></div>`;
+  if(s==='delivered')return `<div class="eta">${ICON.truck}<div><b>${t('delivered')}</b>${calRange(made)}</div></div>`;
+  return `<div class="eta">${ICON.truck}<div><b>${t('expected')}: ${dShort(addDays(made,3))} – ${dShort(addDays(made,5))}</b><span>${t('takes')}</span>${calRange(made)}</div></div>`;
 }
 function itemRow(it){
   const p=PRODUCTS[String(it.product_id)],img=p&&p.image_url;
@@ -265,7 +264,8 @@ function body(o){
   const sub=items.reduce((a,it)=>a+Number(it.price||0)*Number(it.qty||1),0);
   const disc=Number(o.discount_amount||o.discount||0);
   const del=Math.max(0,Number(o.total||0)-sub+disc);
-  const sums=items.length?`<div class="sums"><div><span>${t('subtotal')}</span><span>${money(sub)}</span></div>${disc>0?`<div class="disc"><span>${t('discount')}${o.promo_code?' ('+esc(o.promo_code)+')':''}</span><span>− ${money(disc)}</span></div>`:''}<div><span>${t('delivery')}</span><span>${del>0?money(del):t('free')}</span></div></div>`:'';
+  const gv=o.governorate||String(addr||'').split(',')[0].trim();
+  const sums=items.length?`<div class="sums"><h4 class="sums-h">${t('paysum')}</h4><div><span>${t('itemsCost')}</span><span>${money(sub)}</span></div>${disc>0?`<div class="disc"><span>${t('discount')}${o.promo_code?' ('+esc(o.promo_code)+')':''}</span><span>− ${money(disc)}</span></div>`:''}<div><span>${t('delFee')}${gv?' · '+esc(gv):''}</span><span>${del>0?money(del):t('free')}</span></div></div>`:'';
   return `${etaBlock(o)}
    <div class="items">${items.map(itemRow).join('')}</div>${sums}
    <div class="total"><span>${t('total')}</span><b>${money(o.total)}</b></div>
