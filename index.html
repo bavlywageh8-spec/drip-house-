@@ -1023,6 +1023,30 @@ body{font-variant-emoji:text}
 .orders-link:hover{background:rgba(111,232,213,.12);border-color:var(--mint)}
 .orders-link svg{width:20px;height:20px}
 </style>
+<style id="dh-card-look-style">
+/* ---- product pictures: whole picture visible, square like the reference ---- */
+.product-img,#products .product-img,.prow-track .product-img{height:auto!important;grid-template-rows:auto auto!important}
+.product-image-frame{aspect-ratio:1/1;height:auto!important}
+.product-image-frame img{width:100%!important;height:100%!important;object-fit:contain!important;padding:0!important}
+/* ---- NEW badge: round, top right ---- */
+.product-image-frame .tag.is-new{position:absolute!important;top:12px!important;right:12px!important;left:auto!important;width:58px;height:58px;padding:0!important;border-radius:50%;display:block!important;text-align:center;background:#68f2d2;color:#03221b;font:700 14px "DM Sans",sans-serif!important;line-height:58px!important;letter-spacing:0!important;text-transform:lowercase;box-shadow:0 6px 18px #68f2d233}
+.product-image-frame .tag.is-new::first-letter{text-transform:uppercase}
+.product.soldout .tag.is-new{background:#263b39;color:#c9dcd8;box-shadow:none}
+.product-image-frame:has(.tag.is-new) .p-badge{right:auto!important;left:12px!important}
+/* ---- discount price: old price struck through, new price in red ---- */
+.price{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px}
+.price del{display:inline!important;color:#f4f4f4!important;font:700 15px "DM Sans",sans-serif!important;text-decoration:line-through;text-decoration-thickness:1.6px}
+.price.sale .now{color:#ff2a2a!important;font:700 20px "DM Sans",sans-serif;letter-spacing:0}
+/* ---- touching the product text changes its colour ---- */
+.product-info h3,.product-info>small{transition:color .18s ease}
+.product.tx-hit .product-info h3,.product.tx-hit .product-info>small,.product-info h3:active,.product-info>small:active{color:#68f2d2!important}
+@media(hover:hover){.product-info:hover h3{color:#68f2d2}}
+@media(max-width:620px){
+  .product-image-frame .tag.is-new{width:44px;height:44px;line-height:44px!important;top:8px!important;right:8px!important;font-size:11px!important}
+  .product-image-frame:has(.tag.is-new) .p-badge{left:8px!important;top:8px!important}
+  .price del{font-size:12px!important}.price.sale .now{font-size:15px}
+}
+</style>
 </head>
 <body class="noise">
 <div class="bg-fx" aria-hidden="true"><div class="grid"></div><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="mist m1"></i><i class="mist m2"></i></div>
@@ -1259,7 +1283,7 @@ const findLine=(id,v)=>cart.find(c=>lineKey(c.id,c.v)===lineKey(id,v));
 /* ================= PRODUCTS ================= */
 function productCard(p,extraClass=''){
   const img=p.image_url||fallbackProductImage(p),out=Number(p.stock)<=0,dc=Number(p.discount_percent)||0;
-  return `<article class="product ${extraClass} ${out?'soldout':''}" data-product="${safe(p.id)}" tabindex="0" aria-label="${safe(p.name)}"><div class="product-img"><div class="product-image-frame"><span class="tag">${isNewItem(p)?t('newtag'):safe(catLabel(p.category))}</span>${out?`<span class="p-badge sold">${t('sold_out')}</span>`:dc>0?`<span class="p-badge off">-${dc}%</span>`:''}${img?`<img src="${safe(img)}" alt="${safe(p.name)}" loading="lazy" onerror="this.remove()">`:device()}<button type="button" class="product-quick-view" data-quick-view="${safe(p.id)}">${t('quick_view')}</button></div><div class="product-rating" data-product-rating="${safe(p.id)}"></div></div><div class="product-info"><small>${safe(catLabel(p.category))}</small><h3>${safe(p.name)}</h3><div class="product-bottom"><span class="price ${dc>0&&!out?'sale':''}">${dc>0?`<del style="display:block;color:#80918f;font-size:11px">${money(p.price)}</del>`:''}${money(price(p))}</span></div><div class="product-actions"><button type="button" class="product-add-cart" data-add="${safe(p.id)}" ${out?'disabled':''}><span>${t('add_cart')}</span></button></div></div></article>`;
+  return `<article class="product ${extraClass} ${out?'soldout':''}" data-product="${safe(p.id)}" tabindex="0" aria-label="${safe(p.name)}"><div class="product-img"><div class="product-image-frame"><span class="tag${isNewItem(p)?' is-new':''}">${isNewItem(p)?t('newtag'):safe(catLabel(p.category))}</span>${out?`<span class="p-badge sold">${t('sold_out')}</span>`:dc>0?`<span class="p-badge off">-${dc}%</span>`:''}${img?`<img src="${safe(img)}" alt="${safe(p.name)}" loading="lazy" onerror="this.remove()">`:device()}<button type="button" class="product-quick-view" data-quick-view="${safe(p.id)}">${t('quick_view')}</button></div><div class="product-rating" data-product-rating="${safe(p.id)}"></div></div><div class="product-info"><small>${safe(catLabel(p.category))}</small><h3>${safe(p.name)}</h3><div class="product-bottom"><span class="price ${dc>0&&!out?'sale':''}">${dc>0?`<del>${money(p.price)}</del>`:''}<span class="now">${money(price(p))}</span></span></div><div class="product-actions"><button type="button" class="product-add-cart" data-add="${safe(p.id)}" ${out?'disabled':''}><span>${t('add_cart')}</span></button></div></div></article>`;
 }
 function renderProducts(){
   const q=($('#siteSearch')?.value||'').trim().toLowerCase();
@@ -1977,9 +2001,8 @@ function renderRows(){
   const box=$('#prowsBox');if(!box)return;
   const sorted=products.slice();
   let news=hasDates()?sorted.filter(isNewItem).sort((a,b)=>+new Date(b.created_at)-+new Date(a.created_at)):sorted.slice(0,6);
-  let best=bestSalesIds.map(id=>sorted.find(p=>String(p.id)===id)).filter(Boolean);
-  /* always show 6: top sellers first, then flagged best sellers, then other products */
-  [sorted.filter(p=>p.is_best_seller),sorted].forEach(pool=>{pool.forEach(p=>{if(best.length<6&&!best.includes(p))best.push(p)})});
+  /* only products that really sold (from order history); if the sales summary is not set up yet, only products you flagged as best sellers; never padded with other products */
+  let best=bestSalesIds.length?bestSalesIds.map(id=>sorted.find(p=>String(p.id)===id)).filter(Boolean):sorted.filter(p=>p.is_best_seller);
   const rows=[];
   if(news.length)rows.push(rowBlock('new',t('rw_new_k'),t('rw_new'),news.slice(0,6)));
   if(best.length)rows.push(rowBlock('best',t('rw_best_k'),t('rw_best'),best.slice(0,6)));
@@ -2212,6 +2235,21 @@ function cutout(img){
 function scan(){document.querySelectorAll('.product-image-frame img:not([data-dh]),.detail-visual img:not([data-dh])').forEach(img=>{img.dataset.dh='1';cutout(img)})}
 let tm;new MutationObserver(()=>{clearTimeout(tm);tm=setTimeout(scan,120)}).observe(document.body,{childList:true,subtree:true});
 scan();
+})();
+</script>
+<script>
+/* touch feedback: the product text turns teal while a finger is on it */
+(function(){
+  let cur=null,tm=null;
+  const off=()=>{clearTimeout(tm);if(cur){cur.classList.remove('tx-hit');cur=null}};
+  document.addEventListener('touchstart',e=>{
+    const info=e.target.closest&&e.target.closest('.product-info');
+    if(!info||e.target.closest('.product-actions,.product-add-cart')){off();return}
+    off();cur=info.closest('.product');if(cur)cur.classList.add('tx-hit');
+  },{passive:true});
+  document.addEventListener('touchend',()=>{clearTimeout(tm);tm=setTimeout(off,450)},{passive:true});
+  document.addEventListener('touchmove',off,{passive:true});
+  document.addEventListener('touchcancel',off,{passive:true});
 })();
 </script>
 </body>
