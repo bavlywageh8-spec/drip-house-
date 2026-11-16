@@ -1118,6 +1118,23 @@ body{font-variant-emoji:text}
 .offer-section .offer-banner+.offer-banner{margin-top:14px}
 .offer-section[hidden]{display:none}
 </style>
+<style id="dh-slide-fix-style">
+.detail-visual img.slide-ghost{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;max-height:none!important;object-fit:contain!important;z-index:1;pointer-events:none}
+.detail-visual{overflow:hidden!important}
+</style>
+<style id="dh-swipe-style">
+/* thumbnails close together, like the recording */
+.vstrip{margin-top:6px!important}
+.vstrip .vthumbs{gap:4px!important;padding:0!important}
+.vthumb{flex:0 0 100px!important}
+.vthumb img,.vthumb .vt-dot{width:100px!important;height:75px!important;border-radius:4px!important}
+@media(max-width:620px){.vthumb{flex-basis:78px!important}.vthumb img,.vthumb .vt-dot{width:78px!important;height:58px!important}}
+/* the main picture can be swiped / dragged / scrolled sideways */
+.detail-visual{touch-action:pan-y;cursor:grab;-webkit-user-select:none;user-select:none}
+.detail-visual:active{cursor:grabbing}
+.detail-visual img{-webkit-user-drag:none;user-select:none}
+.vthumbs{touch-action:pan-x pan-y;cursor:grab}
+</style>
 </head>
 <body class="noise">
 <div class="bg-fx" aria-hidden="true"><div class="grid"></div><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="mist m1"></i><i class="mist m2"></i></div>
@@ -2381,6 +2398,107 @@ document.addEventListener('click',e=>{
   const v=e.target.closest('.vthumb:not([data-vbase]),.vsw button');
   if(v){const m=document.getElementById('vErr');if(m)m.hidden=true}
 });
+</script>
+<script>
+/* product picture slideshow: the main picture slides sideways, the chosen thumbnail follows,
+   and the pictures play through once by themselves until the visitor touches something */
+(function(){
+  const DUR=450,HOLD=1500,FIRST=1300;
+  let timer=null,prevIdx=0;
+  const strip=()=>document.querySelector('.vstrip .vthumbs');
+  const idxOn=()=>{const st=strip();if(!st)return 0;const l=[...st.querySelectorAll('.vthumb')];const i=l.findIndex(x=>x.classList.contains('on'));return i<0?0:i};
+  const stop=()=>{clearTimeout(timer);timer=null};
+
+  /* 1) slide transition whenever the main picture changes */
+  new MutationObserver(list=>{
+    for(const m of list){
+      const img=m.target;
+      if(!img||img.id!=='detailMainImage')continue;
+      const old=m.oldValue,now=img.getAttribute('src');
+      if(!old||old===now)continue;
+      const cur=idxOn(),dir=cur>=prevIdx?1:-1;prevIdx=cur;
+      const box=img.parentElement;if(!box)continue;
+      box.querySelectorAll('.slide-ghost').forEach(g=>g.remove());
+      const g=document.createElement('img');g.className='slide-ghost';g.alt='';g.src=old;
+      g.style.cssText='position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;transition:transform '+DUR+'ms cubic-bezier(.4,.1,.2,1);transform:translateX(0);pointer-events:none';
+      box.appendChild(g);
+      img.style.transition='none';img.style.transform='translateX('+(dir*100)+'%)';void img.offsetWidth;
+      img.style.transition='transform '+DUR+'ms cubic-bezier(.4,.1,.2,1)';img.style.transform='translateX(0)';
+      g.style.transform='translateX('+(-dir*100)+'%)';
+      setTimeout(()=>{g.remove();img.style.transition='';img.style.transform=''},DUR+40);
+    }
+  }).observe(document.body,{subtree:true,attributes:true,attributeFilter:['src'],attributeOldValue:true});
+
+  /* 2) play through once, then go back to the first picture and stop */
+  function start(){
+    stop();prevIdx=0;
+    const st=strip();if(!st)return;
+    const thumbs=[...st.querySelectorAll('.vthumb')];if(thumbs.length<3)return;
+    let i=0;
+    const step=()=>{
+      if(!st.isConnected||st.offsetParent===null){stop();return}   /* popup closed */
+      i++;
+      if(i>=thumbs.length){thumbs[0].click();stop();return}
+      thumbs[i].click();timer=setTimeout(step,HOLD);
+    };
+    timer=setTimeout(step,FIRST);
+  }
+  new MutationObserver(()=>{
+    const st=document.querySelector('.vstrip:not([data-auto])');
+    if(st){st.dataset.auto='1'}
+  }).observe(document.body,{childList:true,subtree:true});
+
+  /* any real touch / click by the visitor ends the automatic play */
+  ['pointerdown','touchstart','wheel','keydown'].forEach(ev=>document.addEventListener(ev,e=>{
+    if(e.isTrusted&&timer&&e.target.closest&&e.target.closest('#productModal,.modal,[role=dialog],.detail-visual,.vstrip,.detail-info'))stop();
+  },{passive:true,capture:true}));
+  document.addEventListener('click',e=>{if(e.isTrusted)stop()},true);
+})();
+</script>
+<script>
+/* swipe, drag or scroll sideways on the main picture to move to the next / previous picture */
+(function(){
+  const list=()=>[...document.querySelectorAll('.vstrip .vthumb')];
+  const go=d=>{const l=list();if(l.length<2)return;let i=l.findIndex(x=>x.classList.contains('on'));if(i<0)i=0;const n=i+d;if(n<0||n>=l.length)return;l[n].click()};
+  let sx=0,sy=0,down=false;
+  document.addEventListener('pointerdown',e=>{
+    const v=e.target.closest&&e.target.closest('.detail-visual');
+    if(!v||(e.pointerType==='mouse'&&e.button!==0))return;
+    sx=e.clientX;sy=e.clientY;down=true;
+  },true);
+  document.addEventListener('pointerup',e=>{
+    if(!down)return;down=false;
+    const dx=e.clientX-sx,dy=e.clientY-sy;
+    if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.3)go(dx<0?1:-1);
+  },true);
+  document.addEventListener('pointercancel',()=>{down=false},true);
+  /* trackpad / mouse wheel sideways over the picture */
+  let acc=0,lock=0;
+  document.addEventListener('wheel',e=>{
+    const v=e.target.closest&&e.target.closest('.detail-visual');
+    if(!v||Math.abs(e.deltaX)<=Math.abs(e.deltaY))return;
+    e.preventDefault();
+    const now=Date.now();if(now<lock)return;
+    acc+=e.deltaX;
+    if(Math.abs(acc)>40){go(acc>0?1:-1);acc=0;lock=now+550}
+  },{passive:false});
+  /* mouse: drag the thumbnail row */
+  let ds=null;
+  document.addEventListener('pointerdown',e=>{
+    if(e.pointerType!=='mouse'||e.button!==0)return;
+    const st=e.target.closest&&e.target.closest('.vthumbs');if(!st)return;
+    ds={st,x:e.clientX,left:st.scrollLeft,moved:false};
+  },true);
+  document.addEventListener('pointermove',e=>{
+    if(!ds)return;const dx=e.clientX-ds.x;
+    if(Math.abs(dx)>4)ds.moved=true;
+    if(ds.moved)ds.st.scrollLeft=ds.left-dx;
+  },true);
+  document.addEventListener('pointerup',()=>{
+    if(ds&&ds.moved)ds.st.addEventListener('click',ev=>{ev.stopPropagation();ev.preventDefault()},{capture:true,once:true});
+    ds=null;
+  },true);
+})();
 </script>
 </body>
 </html>
