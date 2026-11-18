@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Driphouse — Admin</title><meta name="robots" content="noindex">
+<head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' https: data: blob:; media-src 'self' https: blob:; connect-src 'self' https://lmjiujxxzgctlstfbupg.supabase.co wss://lmjiujxxzgctlstfbupg.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'"><meta name="referrer" content="no-referrer"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Driphouse — Admin</title><meta name="robots" content="noindex,nofollow,noarchive">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--z:1;--bg:#050908;--panel:#0c1413;--panel2:#101b19;--line:#1b2b29;--mint:#65f2d0;--mint2:#a9f5e2;--deep:#1c8f79;--muted:#84a09b;--white:#eef7f5;--red:#ff7b7b;--gold:#e5bd69}
@@ -840,5 +840,10 @@ document.addEventListener('click',function(e){
   let tm;new MutationObserver(()=>{clearTimeout(tm);tm=setTimeout(label,60)}).observe(document.body,{childList:true,subtree:true});
   label();
 })();
+
+/* security: auto sign-out after 30 minutes without activity */
+(function(){let t;const out=async()=>{try{await db.auth.signOut()}catch(e){}me=null;location.reload()};
+const arm=()=>{clearTimeout(t);t=setTimeout(()=>{if(me)out()},30*60*1000)};
+['click','keydown','mousemove','touchstart'].forEach(ev=>addEventListener(ev,arm,{passive:true}));arm()})();
 </script>
 </body></html>
